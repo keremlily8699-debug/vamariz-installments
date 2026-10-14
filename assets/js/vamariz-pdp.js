@@ -1,5 +1,5 @@
 /**
- * Vamariz PDP Dynamic Price Calculator & Modal Interactivity
+ * Vamareys PDP Dynamic Price Calculator & Modal Interactivity
  * Modern Persian Numerals & Accessible Focus Management
  */
 jQuery(document).ready(function ($) {

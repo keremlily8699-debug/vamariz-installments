@@ -1,8 +1,8 @@
 <?php
 /**
- * Vamariz Melipayamak SMS Integration & Pattern Engine (وب‌سرویس خدماتی اشتراکی)
+ * Vamareys Melipayamak SMS Integration & Pattern Engine (وب‌سرویس خدماتی اشتراکی)
  *
- * @package VamarizInstallments
+ * @package VamareysInstallments
  */
 
 if (!defined('ABSPATH')) {
@@ -322,7 +322,7 @@ class Vamariz_SMS {
             'reminder_3d' => array(
                 'title'       => 'یادآوری ۳ روز پیش از سررسید قسط',
                 'description' => 'توسط کران‌جاب روزانه، ۳ روز مانده به سررسید ارسال می‌گردد.',
-                'template'    => "واماریز\nسلام {0} عزیز،\nیادآوری: ۳ روز تا موعد قسط {1} سفارش {2} به مبلغ {3} تومان باقیمانده است.\nپرداخت آنلاین: vamareys.com/?vamariz_pay={4}",
+                'template'    => "واماریز\nسلام {0} عزیز،\nیادآوری: ۳ روز تا موعد قسط {1} سفارش {2} به مبلغ {3} تومان باقیمانده است.\nپرداخت آنلاین: vamareys.com/?vamareys_pay={4}",
                 'vars'        => array(
                     '{0}' => 'نام مشتری (مثال: علی رضایی)',
                     '{1}' => 'شماره قسط (مثال: دوم)',
@@ -334,7 +334,7 @@ class Vamariz_SMS {
             'reminder_day' => array(
                 'title'       => 'یادآوری روز موعد قسط',
                 'description' => 'در روز سررسید قسط در ساعت ۹:۰۰ صبح ارسال می‌شود.',
-                'template'    => "واماریز\nسلام {0} عزیز،\nامروز موعد پرداخت قسط {1} سفارش {2} به مبلغ {3} تومان می‌باشد.\nپرداخت آنلاین: vamareys.com/?vamariz_pay={4}\nبا تشکر از خوش‌حسابی شما",
+                'template'    => "واماریز\nسلام {0} عزیز،\nامروز موعد پرداخت قسط {1} سفارش {2} به مبلغ {3} تومان می‌باشد.\nپرداخت آنلاین: vamareys.com/?vamareys_pay={4}\nبا تشکر از خوش‌حسابی شما",
                 'vars'        => array(
                     '{0}' => 'نام مشتری',
                     '{1}' => 'شماره قسط (مثال: دوم)',
@@ -346,7 +346,7 @@ class Vamariz_SMS {
             'overdue' => array(
                 'title'       => 'اخطار قسط معوقه',
                 'description' => 'در صورت سپری شدن موعد و عدم تسویه قسط ارسال می‌شود.',
-                'template'    => "واماریز\nسلام {0} عزیز،\nموعد قسط {1} سفارش {2} به مبلغ {3} تومان سپری شده است.\nجهت حفظ امتیاز خرید اقساطی نسبت به تسویه اقدام فرمایید:\nپرداخت آنلاین: vamareys.com/?vamariz_pay={4}",
+                'template'    => "واماریز\nسلام {0} عزیز،\nموعد قسط {1} سفارش {2} به مبلغ {3} تومان سپری شده است.\nجهت حفظ امتیاز خرید اقساطی نسبت به تسویه اقدام فرمایید:\nپرداخت آنلاین: vamareys.com/?vamareys_pay={4}",
                 'vars'        => array(
                     '{0}' => 'نام مشتری',
                     '{1}' => 'شماره قسط (مثال: دوم)',
@@ -369,7 +369,7 @@ class Vamariz_SMS {
             'invite' => array(
                 'title'       => 'ارسال دعوت‌نامه اقساطی',
                 'description' => 'هنگام صدور دعوت‌نامه برای مشتری جدید از پیشخوان ارسال می‌شود.',
-                'template'    => "واماریز\nسلام {0} عزیز،\nدعوت‌نامه خرید اقساطی ۴ ماهه بدون کارمزد برای شما صادر شد.\nفعال‌سازی در لینک: vamareys.com/?vamariz_invite={1}",
+                'template'    => "واماریز\nسلام {0} عزیز،\nدعوت‌نامه خرید اقساطی ۴ ماهه بدون کارمزد برای شما صادر شد.\nفعال‌سازی در لینک: vamareys.com/?vamareys_invite={1}",
                 'vars'        => array(
                     '{0}' => 'نام مشتری (مثال: علی رضایی)',
                     '{1}' => 'توکن دعوت (رشته متنی، مثال: vmz_a8b9c1)',
@@ -475,7 +475,7 @@ class Vamariz_SMS {
         }
 
         // Fallback to text message
-        $pay_url = home_url('/?vamariz_pay=' . $sub_id);
+        $pay_url = home_url('/?vamareys_pay=' . $sub_id);
         $text = "واماریز\n"
               . "سلام {$name} عزیز،\n"
               . "موعد قسط {$step_label} سفارش #{$parent_id} به مبلغ {$amount} تومان فرا رسیده است.\n"
@@ -518,7 +518,7 @@ class Vamariz_SMS {
         }
 
         // Fallback
-        $pay_url = home_url('/?vamariz_pay=' . $sub_id);
+        $pay_url = home_url('/?vamareys_pay=' . $sub_id);
         $text = "واماریز - اخطار سررسید قسط\n"
               . "سلام {$name} عزیز،\n"
               . "موعد قسط {$step_label} سفارش #{$parent_id} گذشته است.\n"
@@ -585,7 +585,7 @@ class Vamariz_SMS {
         }
 
         // Fallback
-        $invite_url = home_url('/?vamariz_invite=' . urlencode($invite_token));
+        $invite_url = home_url('/?vamareys_invite=' . urlencode($invite_token));
         $text = "واماریز\n"
               . "سلام {$name} عزیز،\n"
               . "دعوت‌نامه خرید اقساطی ۴ ماهه بدون کارمزد برای شما صادر شد.\n"

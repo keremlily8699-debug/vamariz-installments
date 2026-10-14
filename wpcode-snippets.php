@@ -1,7 +1,7 @@
 <?php
 /**
  * ============================================================================
- * کدهای آماده افزونه WPCode (یا فانکشن قالب functions.php) برای فروشگاه واماریز
+ * کدهای آماده افزونه WPCode (یا فانکشن قالب functions.php) برای فروشگاه واماریز (Vamareys)
  * ============================================================================
  * 
  * اگر به هر دلیلی تمایل داشتید بخش‌هایی از سیستم را بدون نصب افزونه، مستقیماً
@@ -17,27 +17,28 @@ add_action('init', function () {
     if (!function_exists('get_role') || !function_exists('add_role')) return;
     $customer = get_role('customer');
     $caps = ($customer && !empty($customer->capabilities)) ? (array) $customer->capabilities : array('read' => true);
+    $caps['use_vamareys_installments'] = true;
     $caps['use_vamariz_installments'] = true;
     if (!get_role('installment_customer')) {
         add_role('installment_customer', 'مشتری اقساطی', $caps);
     }
 }, 5);
 
-add_action('show_user_profile', 'vamariz_wpcode_render_profile');
-add_action('edit_user_profile', 'vamariz_wpcode_render_profile');
-function vamariz_wpcode_render_profile($user) {
+add_action('show_user_profile', 'vamareys_wpcode_render_profile');
+add_action('edit_user_profile', 'vamareys_wpcode_render_profile');
+function vamareys_wpcode_render_profile($user) {
     if (!current_user_can('manage_woocommerce') && !current_user_can('promote_users')) return;
     $is_installment = in_array('installment_customer', (array) $user->roles, true);
-    wp_nonce_field('vamariz_save_role_nonce_wpcode', 'vamariz_role_nonce_wpcode');
+    wp_nonce_field('vamareys_save_role_nonce_wpcode', 'vamareys_role_nonce_wpcode');
     ?>
-    <h3 style="margin-top:20px;">خرید اقساطی واماریز</h3>
+    <h3 style="margin-top:20px;">خرید اقساطی واماریز (Vamareys)</h3>
     <table class="form-table">
         <tr>
-            <th><label for="vamariz_is_installment">وضعیت مشتری اقساطی</label></th>
+            <th><label for="vamareys_is_installment">وضعیت مشتری اقساطی</label></th>
             <td>
                 <label>
-                    <input type="checkbox" name="vamariz_is_installment" id="vamariz_is_installment" value="1" <?php checked($is_installment, true); ?>>
-                    <strong>فعال بودن دسترسی به خرید اقساطی ۴ ماهه واماریز</strong>
+                    <input type="checkbox" name="vamareys_is_installment" id="vamareys_is_installment" value="1" <?php checked($is_installment, true); ?>>
+                    <strong>فعال بودن دسترسی به خرید اقساطی ۴ ماهه واماریز (Vamareys)</strong>
                 </label>
             </td>
         </tr>
@@ -45,14 +46,15 @@ function vamariz_wpcode_render_profile($user) {
     <?php
 }
 
-add_action('personal_options_update', 'vamariz_wpcode_save_profile');
-add_action('edit_user_profile_update', 'vamariz_wpcode_save_profile');
-function vamariz_wpcode_save_profile($user_id) {
+add_action('personal_options_update', 'vamareys_wpcode_save_profile');
+add_action('edit_user_profile_update', 'vamareys_wpcode_save_profile');
+function vamareys_wpcode_save_profile($user_id) {
     if (!current_user_can('manage_woocommerce') && !current_user_can('promote_users')) return;
-    if (!isset($_POST['vamariz_role_nonce_wpcode']) || !wp_verify_nonce($_POST['vamariz_role_nonce_wpcode'], 'vamariz_save_role_nonce_wpcode')) return;
+    $nonce = $_POST['vamareys_role_nonce_wpcode'] ?? ($_POST['vamariz_role_nonce_wpcode'] ?? '');
+    if (!wp_verify_nonce($nonce, 'vamareys_save_role_nonce_wpcode') && !wp_verify_nonce($nonce, 'vamariz_save_role_nonce_wpcode')) return;
     $user = get_userdata($user_id);
     if (!$user) return;
-    if (!empty($_POST['vamariz_is_installment'])) {
+    if (!empty($_POST['vamareys_is_installment']) || !empty($_POST['vamariz_is_installment'])) {
         $user->add_role('installment_customer');
     } else {
         $user->remove_role('installment_customer');
@@ -64,7 +66,7 @@ function vamariz_wpcode_save_profile($user_id) {
 // اسنیپت شماره ۲: مخفی‌سازی اسنپ‌پی برای مشتریان اقساطی (در صفحه محصول و تسویه‌حساب)
 // محل اجرا: Frontend Only
 // ============================================================================
-function vamariz_wpcode_is_customer() {
+function vamareys_wpcode_is_customer() {
     if (!is_user_logged_in()) return false;
     $user = wp_get_current_user();
     if (!$user) return false;
@@ -74,14 +76,14 @@ function vamariz_wpcode_is_customer() {
 
 // حذف فیلتر اسنپ‌پی برای جلوگیری از کندی و خطاهای نال‌پوینتر در PHP 8.1
 add_action('wp', function () {
-    if (!is_admin() && vamariz_wpcode_is_customer()) {
+    if (!is_admin() && vamareys_wpcode_is_customer()) {
         remove_filter('woocommerce_available_payment_gateways', 'show_snapppay_payment_gateway_based_on_cart_amount', PHP_INT_MAX);
     }
 }, 5);
 
 // مخفی کردن درگاه اسنپ‌پی در تسویه‌حساب برای مشتریان اقساطی
 add_filter('woocommerce_available_payment_gateways', function ($gateways) {
-    if (!is_admin() && vamariz_wpcode_is_customer()) {
+    if (!is_admin() && vamareys_wpcode_is_customer()) {
         foreach ($gateways as $id => $gateway) {
             if (stripos($id, 'snapppay') !== false || (is_object($gateway) && stripos(get_class($gateway), 'snapppay') !== false)) {
                 unset($gateways[$id]);
@@ -93,8 +95,8 @@ add_filter('woocommerce_available_payment_gateways', function ($gateways) {
 
 // مخفی کردن ویجت اسنپ‌پی در صفحه محصول
 add_action('wp_head', function () {
-    if (is_product() && vamariz_wpcode_is_customer()) {
-        echo '<style id="vamariz-hide-snapppay">.snapppay-pdp-widget, .snapppay-widget, #snapppay-widget, [class*="snapppay"] { display: none !important; }</style>';
+    if (is_product() && vamareys_wpcode_is_customer()) {
+        echo '<style id="vamareys-hide-snapppay">.snapppay-pdp-widget, .snapppay-widget, #snapppay-widget, [class*="snapppay"] { display: none !important; }</style>';
     }
 }, 999);
 
@@ -103,9 +105,9 @@ add_action('wp_head', function () {
 // اسنیپت شماره ۳: ارسال پیامک با وب‌سرویس خدماتی الگو (BaseServiceNumber) ملی‌پیامک
 // محل اجرا: Run Everywhere
 // ============================================================================
-function vamariz_send_melipayamak_pattern_sms($to, $body_id, array $variables = array()) {
-    $username = get_option('vamariz_sms_username', '');
-    $password = get_option('vamariz_sms_password', '');
+function vamareys_send_melipayamak_pattern_sms($to, $body_id, array $variables = array()) {
+    $username = get_option('vamareys_sms_username', get_option('vamariz_sms_username', ''));
+    $password = get_option('vamareys_sms_password', get_option('vamariz_sms_password', ''));
 
     if (empty($username) || empty($password)) {
         return array('success' => false, 'message' => 'نام کاربری یا کلمه عبور ملی‌پیامک ثبت نشده است.');
@@ -113,7 +115,7 @@ function vamariz_send_melipayamak_pattern_sms($to, $body_id, array $variables = 
 
     // نرمال‌سازی شماره گیرنده
     $persian = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
-    $arabic  = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    $arabic  = ['٠','١','٢','٣','٤','٥','٦','٧','۸','٩'];
     $english = ['0','1','2','3','4','5','6','7','8','9'];
     $phone   = str_replace($persian, $english, $to);
     $phone   = str_replace($arabic, $english, $phone);
@@ -161,12 +163,13 @@ function vamariz_send_melipayamak_pattern_sms($to, $body_id, array $variables = 
 
 
 // ============================================================================
-// اسنیپت شماره ۴: ریدایرکت مستقیم پرداخت اقساط (?vamariz_pay=ID)
+// اسنیپت شماره ۴: ریدایرکت مستقیم پرداخت اقساط (?vamareys_pay=ID یا ?vamariz_pay=ID)
 // محل اجرا: Run Everywhere
 // ============================================================================
 add_action('init', function () {
-    if (!empty($_GET['vamariz_pay'])) {
-        $sub_id = absint($_GET['vamariz_pay']);
+    $pay_param = !empty($_GET['vamareys_pay']) ? $_GET['vamareys_pay'] : (!empty($_GET['vamariz_pay']) ? $_GET['vamariz_pay'] : null);
+    if (!empty($pay_param)) {
+        $sub_id = absint($pay_param);
         if ($sub_id > 0 && function_exists('wc_get_order')) {
             $order = wc_get_order($sub_id);
             if ($order) {

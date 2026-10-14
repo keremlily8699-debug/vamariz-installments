@@ -1,5 +1,5 @@
 /**
- * Vamariz Admin Dashboard Interactions
+ * Vamareys Admin Dashboard Interactions
  */
 jQuery(document).ready(function ($) {
     // Copy pattern template text helper

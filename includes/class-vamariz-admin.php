@@ -1,8 +1,8 @@
 <?php
 /**
- * Vamariz Admin Dashboard & Operations Center
+ * Vamareys Admin Dashboard & Operations Center
  *
- * @package VamarizInstallments
+ * @package VamareysInstallments
  */
 
 if (!defined('ABSPATH')) {
@@ -28,7 +28,7 @@ class Vamariz_Admin {
 
     public function register_admin_menu() {
         add_menu_page(
-            'اقساط واماریز',
+            'اقساط واماریز (Vamareys)',
             'اقساط واماریز',
             'manage_woocommerce',
             'vamariz-installments',
@@ -220,7 +220,7 @@ class Vamariz_Admin {
         <div class="wrap vamariz-dashboard-wrap" style="direction:rtl; text-align:right;">
             <div class="vamariz-dash-header">
                 <div class="vamariz-dash-brand">
-                    <h2><?php esc_html_e('پیشخوان مدیریت خرید اقساطی واماریز', 'vamariz-installments'); ?></h2>
+                    <h2><?php esc_html_e('پیشخوان مدیریت خرید اقساطی واماریز (Vamareys)', 'vamariz-installments'); ?></h2>
                     <span class="vamariz-badge-version">نسخه <?php echo esc_html(VAMARIZ_INSTALLMENTS_VERSION); ?></span>
                 </div>
             </div>

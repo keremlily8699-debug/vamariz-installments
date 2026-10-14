@@ -1,8 +1,8 @@
 <?php
 /**
- * Vamariz SnappPay Conditional Suppression Engine
+ * Vamareys SnappPay Conditional Suppression Engine
  *
- * @package VamarizInstallments
+ * @package VamareysInstallments
  */
 
 if (!defined('ABSPATH')) {

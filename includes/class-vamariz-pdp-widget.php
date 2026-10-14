@@ -1,8 +1,8 @@
 <?php
 /**
- * Vamariz Single Product Page Widget and Modal
+ * Vamareys Single Product Page Widget and Modal
  *
- * @package VamarizInstallments
+ * @package VamareysInstallments
  */
 
 if (!defined('ABSPATH')) {
@@ -108,11 +108,11 @@ class Vamariz_PDP_Widget {
         $installment_amount = $price > 0 ? round($price / 4) : 0;
         $formatted_fa = self::to_fa_digits(number_format($installment_amount));
         ?>
-        <div class="vamariz-installment-widget" id="vamariz-installment-widget" aria-label="<?php esc_attr_e('طرح خرید اقساطی ۴ ماهه واماریز', 'vamariz-installments'); ?>">
+        <div class="vamariz-installment-widget" id="vamariz-installment-widget" aria-label="<?php esc_attr_e('طرح خرید اقساطی ۴ ماهه واماریز (Vamareys)', 'vamariz-installments'); ?>">
             <div class="vamariz-widget-header-row">
                 <div class="vamariz-widget-badge">
                     <span class="vamariz-badge-dot"></span>
-                    <span><?php esc_html_e('خرید اقساطی اختصاصی واماریز', 'vamariz-installments'); ?></span>
+                    <span><?php esc_html_e('خرید اقساطی اختصاصی واماریز (Vamareys)', 'vamariz-installments'); ?></span>
                 </div>
                 <div class="vamariz-upfront-badge">
                     <span><?php esc_html_e('پیش‌پرداخت امروز: فقط ۲۵٪', 'vamariz-installments'); ?></span>
@@ -186,7 +186,7 @@ class Vamariz_PDP_Widget {
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line><line x1="5" y1="15" x2="8" y2="15"></line></svg>
                         </div>
                         <div>
-                            <h3 id="vamariz-modal-title"><?php esc_html_e('طرح خرید اقساطی ۴ ماهه واماریز', 'vamariz-installments'); ?></h3>
+                            <h3 id="vamariz-modal-title"><?php esc_html_e('طرح خرید اقساطی ۴ ماهه واماریز (Vamareys)', 'vamariz-installments'); ?></h3>
                             <span class="vamariz-header-sub"><?php esc_html_e('بدون سود، بدون ضامن، با ارسال آنی سفارش', 'vamariz-installments'); ?></span>
                         </div>
                     </div>
@@ -244,13 +244,13 @@ class Vamariz_PDP_Widget {
                                 <div class="vamariz-circle-num" aria-hidden="true">۱</div>
                                 <div>
                                     <strong><?php esc_html_e('ثبت سفارش و پرداخت قسط اول (۲۵٪)', 'vamariz-installments'); ?></strong>
-                                    <p><?php esc_html_e('در صفحه تسویه‌حساب گزینه خرید اقساطی واماریز را انتخاب کرده و تنها ۲۵٪ مبلغ را به صورت آنلاین واریز کنید.', 'vamariz-installments'); ?></p>
+                                    <p><?php esc_html_e('در صفحه تسویه‌حساب گزینه خرید اقساطی واماریز (Vamareys) را انتخاب کرده و تنها ۲۵٪ مبلغ را به صورت آنلاین واریز کنید.', 'vamariz-installments'); ?></p>
                                 </div>
                             </li>
                             <li>
                                 <div class="vamariz-circle-num" aria-hidden="true">۲</div>
                                 <div>
-                                    <strong><?php esc_html_e('ارسال فوری و کامل کالا توسط واماریز', 'vamariz-installments'); ?></strong>
+                                    <strong><?php esc_html_e('ارسال فوری و کامل کالا توسط واماریز (Vamareys)', 'vamariz-installments'); ?></strong>
                                     <p><?php esc_html_e('نیازی به تسویه کامل برای دریافت کالا نیست! سفارش شما بلافاصله پس از پرداخت قسط اول بسته‌بندی و تحویل پست / پیک می‌گردد.', 'vamariz-installments'); ?></p>
                                 </div>
                             </li>
@@ -270,7 +270,7 @@ class Vamariz_PDP_Widget {
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                             <?php esc_html_e('شرایط و قوانین خوش‌حسابی:', 'vamariz-installments'); ?>
                         </strong>
-                        <p><?php esc_html_e('این طرح ویژه مشتریان خوش‌حساب واماریز بوده و بدون نیاز به چک، سفته یا ضامن ارائه می‌شود. در صورت تاخیر در تسویه هر قسط، امتیاز ثبت خریدهای اقساطی بعدی به صورت موقت معلق خواهد شد تا اقساط معوقه تسویه گردند.', 'vamariz-installments'); ?></p>
+                        <p><?php esc_html_e('این طرح ویژه مشتریان خوش‌حساب واماریز (Vamareys) بوده و بدون نیاز به چک، سفته یا ضامن ارائه می‌شود. در صورت تاخیر در تسویه هر قسط، امتیاز ثبت خریدهای اقساطی بعدی به صورت موقت معلق خواهد شد تا اقساط معوقه تسویه گردند.', 'vamariz-installments'); ?></p>
                     </div>
                 </div>
 

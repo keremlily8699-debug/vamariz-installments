@@ -1,8 +1,8 @@
 <?php
 /**
- * Vamariz Roles and Invitation Token Manager
+ * Vamareys Roles and Invitation Token Manager
  *
- * @package VamarizInstallments
+ * @package VamareysInstallments
  */
 
 if (!defined('ABSPATH')) {
@@ -13,7 +13,8 @@ class Vamariz_Roles {
 
     const ROLE_SLUG = 'installment_customer';
     const ROLE_NAME = 'مشتری اقساطی';
-    const OPTION_INVITES = 'vamariz_invitations';
+    const OPTION_INVITES = 'vamareys_invitations';
+    const OPTION_INVITES_LEGACY = 'vamariz_invitations';
 
     private static $instance = null;
 
@@ -159,12 +160,14 @@ class Vamariz_Roles {
     /**
      * Capture invitation token from URL and store in cookie or immediately upgrade logged in user.
      */
-    public function capture_invite_token() {
-        if (empty($_GET['vamariz_invite'])) {
-            return;
+     public function capture_invite_token() {
+        $token = '';
+        if (!empty($_GET['vamareys_invite'])) {
+            $token = sanitize_text_field(wp_unslash($_GET['vamareys_invite']));
+        } elseif (!empty($_GET['vamariz_invite'])) {
+            $token = sanitize_text_field(wp_unslash($_GET['vamariz_invite']));
         }
 
-        $token = sanitize_text_field(wp_unslash($_GET['vamariz_invite']));
         if (empty($token)) {
             return;
         }
@@ -187,6 +190,7 @@ class Vamariz_Roles {
                     if (!headers_sent()) {
                         $cookie_path   = defined('COOKIEPATH') ? COOKIEPATH : '/';
                         $cookie_domain = defined('COOKIE_DOMAIN') ? COOKIE_DOMAIN : '';
+                        setcookie('vamareys_invite_token', '', time() - 3600, $cookie_path, $cookie_domain);
                         setcookie('vamariz_invite_token', '', time() - 3600, $cookie_path, $cookie_domain);
                     }
                     return;
@@ -198,7 +202,8 @@ class Vamariz_Roles {
         if (!headers_sent()) {
             $cookie_path   = defined('COOKIEPATH') ? COOKIEPATH : '/';
             $cookie_domain = defined('COOKIE_DOMAIN') ? COOKIE_DOMAIN : '';
-            setcookie('vamariz_invite_token', $token, time() + 86400 * 3, $cookie_path, $cookie_domain, is_ssl(), true);
+            setcookie('vamareys_invite_token', $token, time() + 86400 * 30, $cookie_path, $cookie_domain, is_ssl(), true);
+            setcookie('vamariz_invite_token', $token, time() + 86400 * 30, $cookie_path, $cookie_domain, is_ssl(), true);
         }
     }
 
@@ -212,10 +217,16 @@ class Vamariz_Roles {
         }
 
         $token = '';
-        if (!empty($_GET['vamariz_invite'])) {
+        if (!empty($_GET['vamareys_invite'])) {
+            $token = sanitize_text_field(wp_unslash($_GET['vamareys_invite']));
+        } elseif (!empty($_GET['vamariz_invite'])) {
             $token = sanitize_text_field(wp_unslash($_GET['vamariz_invite']));
+        } elseif (!empty($_POST['vamareys_invite_token'])) {
+            $token = sanitize_text_field(wp_unslash($_POST['vamareys_invite_token']));
         } elseif (!empty($_POST['vamariz_invite_token'])) {
             $token = sanitize_text_field(wp_unslash($_POST['vamariz_invite_token']));
+        } elseif (!empty($_COOKIE['vamareys_invite_token'])) {
+            $token = sanitize_text_field(wp_unslash($_COOKIE['vamareys_invite_token']));
         } elseif (!empty($_COOKIE['vamariz_invite_token'])) {
             $token = sanitize_text_field(wp_unslash($_COOKIE['vamariz_invite_token']));
         }
@@ -236,7 +247,7 @@ class Vamariz_Roles {
                 '<strong>' . esc_html($invite['name']) . '</strong>'
             )
             . '</div>';
-        echo '<input type="hidden" name="vamariz_invite_token" value="' . esc_attr($token) . '" />';
+        echo '<input type="hidden" name="vamareys_invite_token" value="' . esc_attr($token) . '" />';
     }
 
     /**
@@ -244,10 +255,16 @@ class Vamariz_Roles {
      */
     public function handle_registration_with_invite($customer_id, $new_customer_data = array(), $password_generated = false) {
         $token = '';
-        if (!empty($_POST['vamariz_invite_token'])) {
+        if (!empty($_POST['vamareys_invite_token'])) {
+            $token = sanitize_text_field(wp_unslash($_POST['vamareys_invite_token']));
+        } elseif (!empty($_POST['vamariz_invite_token'])) {
             $token = sanitize_text_field(wp_unslash($_POST['vamariz_invite_token']));
+        } elseif (!empty($_GET['vamareys_invite'])) {
+            $token = sanitize_text_field(wp_unslash($_GET['vamareys_invite']));
         } elseif (!empty($_GET['vamariz_invite'])) {
             $token = sanitize_text_field(wp_unslash($_GET['vamariz_invite']));
+        } elseif (!empty($_COOKIE['vamareys_invite_token'])) {
+            $token = sanitize_text_field(wp_unslash($_COOKIE['vamareys_invite_token']));
         } elseif (!empty($_COOKIE['vamariz_invite_token'])) {
             $token = sanitize_text_field(wp_unslash($_COOKIE['vamariz_invite_token']));
         }
@@ -327,12 +344,12 @@ class Vamariz_Roles {
     }
 
     public static function get_invite($token) {
-        $invites = get_option(self::OPTION_INVITES, array());
+        $invites = self::get_all_invites();
         return isset($invites[$token]) ? $invites[$token] : null;
     }
 
     public static function mark_invite_used($token, $user_id) {
-        $invites = get_option(self::OPTION_INVITES, array());
+        $invites = self::get_all_invites();
         if (isset($invites[$token])) {
             $invites[$token]['status']  = 'used';
             $invites[$token]['used_by'] = (int) $user_id;
@@ -342,7 +359,7 @@ class Vamariz_Roles {
     }
 
     public static function revoke_invite($token) {
-        $invites = get_option(self::OPTION_INVITES, array());
+        $invites = self::get_all_invites();
         if (isset($invites[$token])) {
             $invites[$token]['status'] = 'revoked';
             update_option(self::OPTION_INVITES, $invites);
@@ -352,7 +369,10 @@ class Vamariz_Roles {
     }
 
     public static function get_all_invites() {
-        $invites = get_option(self::OPTION_INVITES, array());
+        $invites = get_option(self::OPTION_INVITES, null);
+        if ($invites === null) {
+            $invites = get_option(self::OPTION_INVITES_LEGACY, array());
+        }
         return is_array($invites) ? $invites : array();
     }
 
@@ -361,6 +381,6 @@ class Vamariz_Roles {
         if (!$account_url) {
             $account_url = function_exists('home_url') ? home_url('/my-account/') : '/my-account/';
         }
-        return add_query_arg('vamariz_invite', $token, $account_url);
+        return add_query_arg('vamareys_invite', $token, $account_url);
     }
 }

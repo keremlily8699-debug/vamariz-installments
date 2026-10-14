@@ -1,8 +1,8 @@
 <?php
 /**
- * Vamariz 4-Stage Installments Calculation & Order Lifecycle Engine
+ * Vamareys 4-Stage Installments Calculation & Order Lifecycle Engine
  *
- * @package VamarizInstallments
+ * @package VamareysInstallments
  */
 
 if (!defined('ABSPATH')) {
@@ -413,31 +413,36 @@ class Vamariz_Engine {
     }
 
     /**
-     * Direct sub-order payment redirection (?vamariz_pay=ID).
+     * Direct sub-order payment redirection (?vamareys_pay=ID or ?vamariz_pay=ID).
      */
     public function handle_direct_payment_redirect() {
-        if (!empty($_GET['vamariz_pay'])) {
+        $sub_id = 0;
+        if (!empty($_GET['vamareys_pay'])) {
+            $sub_id = absint($_GET['vamareys_pay']);
+        } elseif (!empty($_GET['vamariz_pay'])) {
             $sub_id = absint($_GET['vamariz_pay']);
-            if ($sub_id > 0 && function_exists('wc_get_order')) {
-                $order = wc_get_order($sub_id);
-                if ($order) {
-                    if ($order->is_paid() || in_array($order->get_status(), array('processing', 'completed'), true)) {
-                        $view_url = method_exists($order, 'get_view_order_url') ? $order->get_view_order_url() : (function_exists('wc_get_account_endpoint_url') ? wc_get_account_endpoint_url('orders') : home_url());
-                        if (function_exists('wc_add_notice')) {
-                            wc_add_notice('این قسط قبلاً با موفقیت تسویه شده است. از حسن توجه و خوش‌حسابی شما سپاسگزاریم.', 'success');
-                        }
-                        wp_safe_redirect($view_url);
-                        exit;
-                    }
+        }
 
-                    $pay_url = method_exists($order, 'get_checkout_payment_url') ? $order->get_checkout_payment_url() : '';
-                    if (!empty($pay_url)) {
-                        wp_redirect($pay_url);
-                        exit;
+        if ($sub_id > 0 && function_exists('wc_get_order')) {
+            $order = wc_get_order($sub_id);
+            if ($order) {
+                if ($order->is_paid() || in_array($order->get_status(), array('processing', 'completed'), true)) {
+                    $view_url = method_exists($order, 'get_view_order_url') ? $order->get_view_order_url() : (function_exists('wc_get_account_endpoint_url') ? wc_get_account_endpoint_url('orders') : home_url());
+                    if (function_exists('wc_add_notice')) {
+                        wc_add_notice('این قسط قبلاً با موفقیت تسویه شده است. از حسن توجه و خوش‌حسابی شما سپاسگزاریم.', 'success');
                     }
+                    wp_safe_redirect($view_url);
+                    exit;
+                }
+
+                $pay_url = method_exists($order, 'get_checkout_payment_url') ? $order->get_checkout_payment_url() : '';
+                if (!empty($pay_url)) {
+                    wp_redirect($pay_url);
+                    exit;
                 }
             }
         }
     }
 }
+
 
