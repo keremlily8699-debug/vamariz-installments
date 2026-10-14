@@ -106,3 +106,232 @@
     background: #fee2e2;
     color: #b91c1c;
 }
+
+.vamariz-badge-status.failed {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px dashed #cbd5e1;
+}
+
+/* Pills */
+.vamariz-pill {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.vamariz-pill-success {
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+.vamariz-pill-warning {
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.vamariz-pill-danger {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.vamariz-pill-secondary {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+/* Filter Bar */
+.vamariz-filters-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 18px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.vamariz-filter-group {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.vamariz-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    color: #334155;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s ease;
+}
+
+.vamariz-filter-btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #94a3b8;
+}
+
+.vamariz-filter-btn.active {
+    background: #0f172a;
+    color: #ffffff;
+    border-color: #0f172a;
+    font-weight: 600;
+}
+
+.vamariz-filter-btn .vamariz-filter-count {
+    background: rgba(0, 0, 0, 0.08);
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-size: 11px;
+}
+
+.vamariz-filter-btn.active .vamariz-filter-count {
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+}
+
+/* Progress Bar */
+.vamariz-progress-wrap {
+    width: 100%;
+    margin-top: 6px;
+}
+
+.vamariz-progress-bar-bg {
+    height: 7px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.vamariz-progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #059669);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.vamariz-progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 3px;
+}
+
+/* Step Cell */
+.vamariz-step-cell {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 8px 10px;
+    min-width: 130px;
+    box-sizing: border-box;
+}
+
+.vamariz-step-cell.is-paid {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+.vamariz-step-cell.is-overdue {
+    background: #fff1f2;
+    border-color: #fecdd3;
+}
+
+.vamariz-step-cell.is-failed {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+    opacity: 0.65;
+}
+
+.vamariz-step-amount {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 4px 0 2px 0;
+}
+
+.vamariz-step-date {
+    font-size: 11px;
+    color: #64748b;
+}
+
+.vamariz-step-actions {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Action Buttons */
+.vamariz-copy-btn,
+.vamariz-copy-link-btn {
+    cursor: pointer;
+    font-size: 11px !important;
+    padding: 2px 8px !important;
+    height: auto !important;
+    line-height: 20px !important;
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #334155 !important;
+    border-radius: 4px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.15s ease !important;
+}
+
+.vamariz-copy-link-btn:hover {
+    background: #f1f5f9 !important;
+    border-color: #059669 !important;
+    color: #059669 !important;
+}
+
+.vamariz-copy-link-btn.copied {
+    background: #ecfdf5 !important;
+    border-color: #059669 !important;
+}
+
+.vamariz-wa-btn {
+    font-size: 11px !important;
+    padding: 2px 8px !important;
+    height: auto !important;
+    line-height: 20px !important;
+    background: #25D366 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 4px !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.vamariz-wa-btn:hover {
+    background: #1eb857 !important;
+    color: #ffffff !important;
+}
+
+/* Quick Tools Box */
+.vamariz-quick-box {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-bottom: 22px;
+}

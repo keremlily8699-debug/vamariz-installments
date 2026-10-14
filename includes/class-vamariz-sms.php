@@ -312,7 +312,7 @@ class Vamariz_SMS {
             'order_confirmation' => array(
                 'title'       => 'تایید ثبت سفارش و طرح اقساطی',
                 'description' => 'بلافاصله پس از پرداخت موفق قسط اول و ثبت سفارش ارسال می‌شود.',
-                'template'    => "واماریز\nسلام {0} عزیز،\nقسط اول سفارش {1} با موفقیت ثبت شد و سفارش شما آماده ارسال است.\nمبلغ هر یک از اقساط بعدی: {2} تومان\nمشاهده سفارش: vamareys.com/my-account/orders",
+                'template'    => "واماریز\nسلام {0} عزیز،\nپیش‌پرداخت سفارش {1} با موفقیت ثبت شد و سفارش شما آماده ارسال است.\nمبلغ هر یک از اقساط ماهانه بعدی: {2} تومان\nبا تشکر از خرید شما از واماریز",
                 'vars'        => array(
                     '{0}' => 'نام مشتری (مثال: علی رضایی)',
                     '{1}' => 'شماره سفارش اصلی (مثال: 1045)',
@@ -322,43 +322,40 @@ class Vamariz_SMS {
             'reminder_3d' => array(
                 'title'       => 'یادآوری ۳ روز پیش از سررسید قسط',
                 'description' => 'توسط کران‌جاب روزانه، ۳ روز مانده به سررسید ارسال می‌گردد.',
-                'template'    => "واماریز\nسلام {0} عزیز،\nیادآوری: ۳ روز تا موعد قسط {1} سفارش {2} به مبلغ {3} تومان باقیمانده است.\nپرداخت آنلاین: vamareys.com/?vamareys_pay={4}",
+                'template'    => "واماریز\nسلام {0} عزیز،\nیادآوری: ۳ روز تا موعد قسط {1} سفارش {2} به مبلغ {3} تومان باقیمانده است.\nجهت تسویه آنلاین به حساب کاربری خود بخش سفارش‌ها مراجعه فرمایید.\nبا تشکر، واماریز",
                 'vars'        => array(
                     '{0}' => 'نام مشتری (مثال: علی رضایی)',
                     '{1}' => 'شماره قسط (مثال: دوم)',
                     '{2}' => 'شماره سفارش اصلی (مثال: 1045)',
                     '{3}' => 'مبلغ قسط به تومان (مثال: 1,250,000)',
-                    '{4}' => 'شناسه پرداخت آنلاین (فقط عدد، مثال: 1089)',
                 ),
             ),
             'reminder_day' => array(
                 'title'       => 'یادآوری روز موعد قسط',
                 'description' => 'در روز سررسید قسط در ساعت ۹:۰۰ صبح ارسال می‌شود.',
-                'template'    => "واماریز\nسلام {0} عزیز،\nامروز موعد پرداخت قسط {1} سفارش {2} به مبلغ {3} تومان می‌باشد.\nپرداخت آنلاین: vamareys.com/?vamareys_pay={4}\nبا تشکر از خوش‌حسابی شما",
+                'template'    => "واماریز\nسلام {0} عزیز،\nامروز موعد پرداخت قسط {1} سفارش {2} به مبلغ {3} تومان می‌باشد.\nجهت تسویه آنلاین به حساب کاربری خود بخش سفارش‌ها مراجعه فرمایید.\nبا تشکر از خوش‌حسابی شما، واماریز",
                 'vars'        => array(
                     '{0}' => 'نام مشتری',
                     '{1}' => 'شماره قسط (مثال: دوم)',
                     '{2}' => 'شماره سفارش اصلی',
                     '{3}' => 'مبلغ قسط به تومان',
-                    '{4}' => 'شناسه پرداخت آنلاین (فقط عدد)',
                 ),
             ),
             'overdue' => array(
                 'title'       => 'اخطار قسط معوقه',
                 'description' => 'در صورت سپری شدن موعد و عدم تسویه قسط ارسال می‌شود.',
-                'template'    => "واماریز\nسلام {0} عزیز،\nموعد قسط {1} سفارش {2} به مبلغ {3} تومان سپری شده است.\nجهت حفظ امتیاز خرید اقساطی نسبت به تسویه اقدام فرمایید:\nپرداخت آنلاین: vamareys.com/?vamareys_pay={4}",
+                'template'    => "واماریز\nسلام {0} عزیز،\nموعد پرداخت قسط {1} سفارش {2} به مبلغ {3} تومان سپری شده است.\nجهت حفظ امتیاز خرید اقساطی، لطفاً نسبت به تسویه از حساب کاربری اقدام فرمایید.\nواماریز",
                 'vars'        => array(
                     '{0}' => 'نام مشتری',
                     '{1}' => 'شماره قسط (مثال: دوم)',
                     '{2}' => 'شماره سفارش اصلی',
                     '{3}' => 'مبلغ قسط به تومان',
-                    '{4}' => 'شناسه پرداخت آنلاین (فقط عدد)',
                 ),
             ),
             'receipt' => array(
                 'title'       => 'رسید پرداخت موفق قسط',
                 'description' => 'بلافاصله پس از پرداخت موفق هر قسط توسط مشتری ارسال می‌شود.',
-                'template'    => "واماریز\nسلام {0} عزیز،\nقسط {1} سفارش {2} به مبلغ {3} تومان با موفقیت تسویه شد.\nاز خوش‌حسابی شما سپاسگزاریم.\nواماریز: vamareys.com",
+                'template'    => "واماریز\nسلام {0} عزیز،\nقسط {1} سفارش {2} به مبلغ {3} تومان با موفقیت تسویه شد.\nاز خوش‌حسابی شما صمیمانه سپاسگزاریم.\nواماریز",
                 'vars'        => array(
                     '{0}' => 'نام مشتری',
                     '{1}' => 'شماره قسط (مثال: دوم)',
@@ -369,10 +366,10 @@ class Vamariz_SMS {
             'invite' => array(
                 'title'       => 'ارسال دعوت‌نامه اقساطی',
                 'description' => 'هنگام صدور دعوت‌نامه برای مشتری جدید از پیشخوان ارسال می‌شود.',
-                'template'    => "واماریز\nسلام {0} عزیز،\nدعوت‌نامه خرید اقساطی ۴ ماهه بدون کارمزد برای شما صادر شد.\nفعال‌سازی در لینک: vamareys.com/?vamareys_invite={1}",
+                'template'    => "واماریز\nسلام {0} عزیز،\nامتیاز خرید اقساطی ۴ ماهه بدون کارمزد برای شما فعال شد.\nکد دعوت اختصاصی: {1}\nجهت آغاز خرید، در سایت وارد حساب کاربری خود شوید.\nواماریز",
                 'vars'        => array(
                     '{0}' => 'نام مشتری (مثال: علی رضایی)',
-                    '{1}' => 'توکن دعوت (رشته متنی، مثال: vmz_a8b9c1)',
+                    '{1}' => 'کد دعوت (رشته متنی، مثال: vmz_a8b9c1)',
                 ),
             ),
         );
@@ -427,9 +424,9 @@ class Vamariz_SMS {
         // Fallback to text message if pattern is not configured
         $text = "واماریز\n"
               . "سلام {$name} عزیز،\n"
-              . "قسط اول سفارش #{$order->get_id()} با موفقیت ثبت شد و سفارش شما آماده ارسال است.\n"
-              . "مبلغ هر قسط: {$step_amount} تومان\n"
-              . "مشاهده سفارش: vamareys.com/my-account/orders";
+              . "پیش‌پرداخت سفارش #{$order->get_id()} با موفقیت ثبت شد و سفارش شما آماده ارسال است.\n"
+              . "مبلغ هر یک از اقساط ماهانه بعدی: {$step_amount} تومان\n"
+              . "با تشکر از خرید شما از واماریز";
         return self::send_sms($phone, $text);
     }
 
@@ -456,31 +453,29 @@ class Vamariz_SMS {
         $step_num   = (int) $sub_order->get_meta('_vamariz_installment_step', true);
         $step_label = self::get_step_label($step_num);
         $amount     = number_format((float) $sub_order->get_total());
-        $sub_id     = $sub_order->get_id();
 
         if ($days_left === 3) {
             $body_id = absint(get_option('vamariz_pattern_reminder_3d_id', 0));
             $enabled = get_option('vamariz_pattern_reminder_3d_enabled', 'yes') === 'yes';
             if ($enabled && $body_id > 0) {
-                // Pattern parameters: {0} Name, {1} Step Label, {2} Parent ID, {3} Amount, {4} Sub ID
-                return self::send_pattern_sms($phone, $body_id, array($name, $step_label, $parent_id, $amount, $sub_id));
+                // Pattern parameters: {0} Name, {1} Step Label, {2} Parent ID, {3} Amount
+                return self::send_pattern_sms($phone, $body_id, array($name, $step_label, $parent_id, $amount));
             }
         } else {
             $body_id = absint(get_option('vamariz_pattern_reminder_day_id', 0));
             $enabled = get_option('vamariz_pattern_reminder_day_enabled', 'yes') === 'yes';
             if ($enabled && $body_id > 0) {
-                // Pattern parameters: {0} Name, {1} Step Label, {2} Parent ID, {3} Amount, {4} Sub ID
-                return self::send_pattern_sms($phone, $body_id, array($name, $step_label, $parent_id, $amount, $sub_id));
+                // Pattern parameters: {0} Name, {1} Step Label, {2} Parent ID, {3} Amount
+                return self::send_pattern_sms($phone, $body_id, array($name, $step_label, $parent_id, $amount));
             }
         }
 
         // Fallback to text message
-        $pay_url = home_url('/?vamareys_pay=' . $sub_id);
         $text = "واماریز\n"
               . "سلام {$name} عزیز،\n"
               . "موعد قسط {$step_label} سفارش #{$parent_id} به مبلغ {$amount} تومان فرا رسیده است.\n"
-              . "پرداخت آنلاین:\n{$pay_url}\n"
-              . "vamareys.com";
+              . "جهت تسویه آنلاین به حساب کاربری خود بخش سفارش‌ها مراجعه فرمایید.\n"
+              . "با تشکر، واماریز";
         return self::send_sms($phone, $text);
     }
 
@@ -507,23 +502,21 @@ class Vamariz_SMS {
         $step_num   = (int) $sub_order->get_meta('_vamariz_installment_step', true);
         $step_label = self::get_step_label($step_num);
         $amount     = number_format((float) $sub_order->get_total());
-        $sub_id     = $sub_order->get_id();
 
         $body_id = absint(get_option('vamariz_pattern_overdue_id', 0));
         $enabled = get_option('vamariz_pattern_overdue_enabled', 'yes') === 'yes';
 
         if ($enabled && $body_id > 0) {
-            // Pattern parameters: {0} Name, {1} Step Label, {2} Parent ID, {3} Amount, {4} Sub ID
-            return self::send_pattern_sms($phone, $body_id, array($name, $step_label, $parent_id, $amount, $sub_id));
+            // Pattern parameters: {0} Name, {1} Step Label, {2} Parent ID, {3} Amount
+            return self::send_pattern_sms($phone, $body_id, array($name, $step_label, $parent_id, $amount));
         }
 
         // Fallback
-        $pay_url = home_url('/?vamareys_pay=' . $sub_id);
         $text = "واماریز - اخطار سررسید قسط\n"
               . "سلام {$name} عزیز،\n"
-              . "موعد قسط {$step_label} سفارش #{$parent_id} گذشته است.\n"
-              . "پرداخت آنلاین:\n{$pay_url}\n"
-              . "vamareys.com";
+              . "موعد پرداخت قسط {$step_label} سفارش #{$parent_id} گذشته است.\n"
+              . "جهت حفظ امتیاز خرید اقساطی، لطفاً نسبت به تسویه از حساب کاربری اقدام فرمایید.\n"
+              . "با تشکر، واماریز";
         return self::send_sms($phone, $text);
     }
 
@@ -563,7 +556,7 @@ class Vamariz_SMS {
         $text = "واماریز\n"
               . "سلام {$name} عزیز،\n"
               . "قسط {$step_label} سفارش #{$parent_id} به مبلغ {$amount} تومان با موفقیت تسویه شد.\n"
-              . "از خوش‌حسابی شما سپاسگزاریم.\nvamareys.com";
+              . "از خوش‌حسابی شما صمیمانه سپاسگزاریم.\nواماریز";
         return self::send_sms($phone, $text);
     }
 
@@ -585,12 +578,12 @@ class Vamariz_SMS {
         }
 
         // Fallback
-        $invite_url = home_url('/?vamareys_invite=' . urlencode($invite_token));
         $text = "واماریز\n"
               . "سلام {$name} عزیز،\n"
-              . "دعوت‌نامه خرید اقساطی ۴ ماهه بدون کارمزد برای شما صادر شد.\n"
-              . "فعال‌سازی در لینک:\n{$invite_url}\n"
-              . "vamareys.com";
+              . "امتیاز خرید اقساطی ۴ ماهه بدون کارمزد برای شما فعال شد.\n"
+              . "کد دعوت اختصاصی شما: {$invite_token}\n"
+              . "جهت آغاز خرید، در سایت وارد حساب کاربری خود شوید.\n"
+              . "واماریز";
         return self::send_sms($clean_phone, $text);
     }
 

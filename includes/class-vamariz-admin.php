@@ -118,6 +118,24 @@ class Vamariz_Admin {
             exit;
         }
 
+        // 3.1 Manually mark installment sub-order as paid (Card-to-card / in-person)
+        if (isset($_POST['vamariz_action']) && $_POST['vamariz_action'] === 'mark_installment_paid') {
+            check_admin_referer('vamariz_admin_action', 'vamariz_nonce');
+            $sub_id = absint($_POST['sub_order_id'] ?? 0);
+            if ($sub_id > 0 && function_exists('wc_get_order')) {
+                $sub_order = wc_get_order($sub_id);
+                if ($sub_order) {
+                    $sub_order->payment_complete();
+                    set_transient('vamariz_admin_notice', array(
+                        'type' => 'success',
+                        'msg'  => sprintf('قسط شماره #%d با موفقیت به عنوان تسویه شده ثبت گردید.', $sub_id)
+                    ), 45);
+                }
+            }
+            wp_safe_redirect(admin_url('admin.php?page=vamariz-installments&tab=orders'));
+            exit;
+        }
+
         // 4. Save Patterns
         if (isset($_POST['vamariz_action']) && $_POST['vamariz_action'] === 'save_patterns') {
             check_admin_referer('vamariz_admin_action', 'vamariz_nonce');
@@ -278,130 +296,438 @@ class Vamariz_Admin {
             return;
         }
 
-        $parent_orders = wc_get_orders(array(
-            'limit'      => 50,
+        $current_filter = sanitize_text_field($_GET['order_filter'] ?? 'active');
+        $search_query   = sanitize_text_field($_GET['s'] ?? '');
+        $now            = current_time('timestamp');
+
+        // Fetch installment orders
+        $raw_orders = wc_get_orders(array(
+            'limit'      => 150,
             'meta_key'   => '_vamariz_is_installment_order',
             'meta_value' => 'yes',
             'orderby'    => 'date',
             'order'      => 'DESC',
         ));
 
-        $total_installments_count = count($parent_orders);
-        $total_amount_sum = 0;
-        $total_collected  = 0;
-        $overdue_count    = 0;
-        $now = current_time('timestamp');
+        $valid_orders_count = 0;
+        $total_amount_sum   = 0;
+        $total_collected    = 0;
+        $total_overdue      = 0;
+        $active_count       = 0;
+        $completed_count    = 0;
+        $failed_count       = 0;
 
-        foreach ($parent_orders as $o) {
-            $tot = (float) $o->get_meta('_vamariz_total_order_amount', true);
-            $total_amount_sum += $tot;
+        $analyzed_orders = array();
 
-            $schedule = $o->get_meta('_vamariz_payment_schedule', true);
-            if (is_array($schedule)) {
-                foreach ($schedule as $st) {
-                    if (isset($st['status']) && $st['status'] === 'completed') {
-                        $total_collected += (float) ($st['amount'] ?? 0);
-                    } elseif (isset($st['due_date']) && $st['due_date'] < $now && isset($st['status']) && $st['status'] !== 'completed') {
-                        $overdue_count++;
+        foreach ($raw_orders as $o) {
+            $status     = $o->get_status();
+            $schedule   = $o->get_meta('_vamariz_payment_schedule', true);
+            if (!is_array($schedule)) {
+                $schedule = array();
+            }
+
+            // Step 1 check
+            $step1_paid = isset($schedule[1]['status']) && $schedule[1]['status'] === 'completed';
+            $is_failed  = in_array($status, array('failed', 'cancelled', 'refunded', 'pending', 'wc-failed', 'wc-cancelled', 'wc-refunded', 'wc-pending'), true) && !$step1_paid;
+
+            if ($is_failed) {
+                $order_type = 'failed';
+                $sub_status = 'failed';
+                $failed_count++;
+                $paid_steps = 0;
+            } else {
+                $order_type = 'valid';
+                $valid_orders_count++;
+
+                $tot = (float) $o->get_meta('_vamariz_total_order_amount', true);
+                if ($tot <= 0) {
+                    $tot = (float) $o->get_total() * 4;
+                }
+                $total_amount_sum += $tot;
+
+                $paid_steps  = 0;
+                $has_overdue = false;
+
+                for ($s = 1; $s <= 4; $s++) {
+                    $st = $schedule[$s] ?? null;
+                    $is_done = ($st && isset($st['status']) && $st['status'] === 'completed');
+                    if ($is_done) {
+                        $paid_steps++;
+                        $total_collected += (float) ($st['amount'] ?? ($tot / 4));
+                    } else {
+                        $due = isset($st['due_date']) ? (int) $st['due_date'] : 0;
+                        if ($due > 0 && $due < $now) {
+                            $has_overdue = true;
+                            $total_overdue++;
+                        }
                     }
                 }
+
+                if ($paid_steps === 4 || $status === 'completed') {
+                    $sub_status = 'completed';
+                    $completed_count++;
+                } elseif ($has_overdue) {
+                    $sub_status = 'overdue';
+                    $active_count++;
+                } else {
+                    $sub_status = 'active';
+                    $active_count++;
+                }
+            }
+
+            $analyzed_orders[] = array(
+                'order'      => $o,
+                'order_type' => $order_type,
+                'sub_status' => $sub_status,
+                'schedule'   => $schedule,
+                'paid_steps' => $paid_steps,
+            );
+        }
+
+        // Apply tab filter & search
+        $display_orders = array();
+        foreach ($analyzed_orders as $item) {
+            $match = false;
+            if ($current_filter === 'active' && $item['order_type'] === 'valid' && $item['sub_status'] !== 'completed') {
+                $match = true;
+            } elseif ($current_filter === 'overdue' && $item['order_type'] === 'valid' && $item['sub_status'] === 'overdue') {
+                $match = true;
+            } elseif ($current_filter === 'completed' && $item['order_type'] === 'valid' && $item['sub_status'] === 'completed') {
+                $match = true;
+            } elseif ($current_filter === 'all_valid' && $item['order_type'] === 'valid') {
+                $match = true;
+            } elseif ($current_filter === 'failed' && $item['order_type'] === 'failed') {
+                $match = true;
+            }
+
+            if ($match && !empty($search_query)) {
+                $po       = $item['order'];
+                $haystack = $po->get_id() . ' ' . $po->get_billing_first_name() . ' ' . $po->get_billing_last_name() . ' ' . $po->get_billing_phone();
+                if (stripos($haystack, $search_query) === false) {
+                    $match = false;
+                }
+            }
+
+            if ($match) {
+                $display_orders[] = $item;
             }
         }
         ?>
-        <div class="vamariz-kpi-grid">
-            <div class="vamariz-kpi-card">
-                <span class="vamariz-kpi-title">تعداد سفارش‌های اقساطی</span>
-                <span class="vamariz-kpi-value"><?php echo esc_html(number_format($total_installments_count)); ?></span>
+        <!-- Accurate KPI Cards (Excludes Failed Orders) -->
+        <div class="vamariz-stats-grid">
+            <div class="vamariz-stat-card">
+                <span class="vamariz-stat-label">اقساط فعال و جاری</span>
+                <span class="vamariz-stat-value"><?php echo esc_html(number_format($active_count)); ?> <small>سفارش</small></span>
             </div>
-            <div class="vamariz-kpi-card">
-                <span class="vamariz-kpi-title">ارزش کل خریدهای اقساطی</span>
-                <span class="vamariz-kpi-value"><?php echo esc_html(number_format($total_amount_sum)); ?> تومان</span>
+            <div class="vamariz-stat-card highlight-green">
+                <span class="vamariz-stat-label">مجموع مبالغ وصول‌شده</span>
+                <span class="vamariz-stat-value"><?php echo esc_html(number_format($total_collected)); ?> <small>تومان</small></span>
             </div>
-            <div class="vamariz-kpi-card vamariz-kpi-success">
-                <span class="vamariz-kpi-title">مجموع مبالغ وصول‌شده</span>
-                <span class="vamariz-kpi-value"><?php echo esc_html(number_format($total_collected)); ?> تومان</span>
+            <div class="vamariz-stat-card">
+                <span class="vamariz-stat-label">ارزش کل اقساط معتبر</span>
+                <span class="vamariz-stat-value"><?php echo esc_html(number_format($total_amount_sum)); ?> <small>تومان</small></span>
             </div>
-            <div class="vamariz-kpi-card vamariz-kpi-warning">
-                <span class="vamariz-kpi-title">اقساط معوقه</span>
-                <span class="vamariz-kpi-value"><?php echo esc_html(number_format($overdue_count)); ?> قسط</span>
+            <div class="vamariz-stat-card <?php echo $total_overdue > 0 ? 'highlight-red' : ''; ?>">
+                <span class="vamariz-stat-label">اقساط معوقه</span>
+                <span class="vamariz-stat-value"><?php echo esc_html(number_format($total_overdue)); ?> <small>قسط</small></span>
+            </div>
+            <div class="vamariz-stat-card">
+                <span class="vamariz-stat-label">تسویه‌شده کامل</span>
+                <span class="vamariz-stat-value"><?php echo esc_html(number_format($completed_count)); ?> <small>سفارش</small></span>
+            </div>
+            <div class="vamariz-stat-card" style="opacity:0.85;">
+                <span class="vamariz-stat-label">پیش‌پرداخت ناموفق</span>
+                <span class="vamariz-stat-value" style="color:#64748b;"><?php echo esc_html(number_format($failed_count)); ?> <small>سفارش</small></span>
             </div>
         </div>
 
-        <div class="vamariz-card-box" style="margin-top:25px; background:#fff; padding:20px; border:1px solid #ccd0d4; border-radius:6px;">
-            <h3 style="margin-top:0;">جدول وضعیت اقساط سفارش‌ها</h3>
-            <table class="wp-list-table widefat fixed striped">
+        <!-- Quick Payment Link Generator Card -->
+        <div class="vamariz-quick-box" style="margin-top:22px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <div>
+                    <h4 style="margin:0 0 5px 0; font-size:15px; color:#1e293b;">
+                        📋 ابزار کپی و ارسال سریع لینک پرداخت قسط به مشتری
+                    </h4>
+                    <span style="font-size:12px; color:#64748b;">
+                        شناسه زیرسفارش قسط (Sub-order ID) را وارد کنید تا لینک پرداخت اختصاصی و پیامک آماده کپی تولید گردد:
+                    </span>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <input type="number" id="vamariz-quick-sub-id" placeholder="شناسه قسط (مثال: 1089)" style="width:170px; font-family:monospace; font-size:13px;" dir="ltr">
+                    <button type="button" class="button button-primary" id="vamariz-gen-paylink-btn">تولید لینک پرداخت</button>
+                </div>
+            </div>
+            <div id="vamariz-quick-output-box" style="display:none; margin-top:14px; padding-top:12px; border-top:1px dashed #cbd5e1;">
+                <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+                    <div style="flex:1; min-width:280px;">
+                        <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px; color:#475569;">لینک مستقیم پرداخت قسط:</label>
+                        <div style="display:flex; gap:6px;">
+                            <input type="text" id="vamariz-quick-result-url" readonly style="width:100%; background:#fff; font-family:monospace; font-size:12px;" dir="ltr">
+                            <button type="button" class="button button-secondary vamariz-copy-link-btn" id="vamariz-quick-copy-link-btn" data-copy-link="">کپی لینک</button>
+                        </div>
+                    </div>
+                    <div style="flex:1.5; min-width:320px;">
+                        <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px; color:#475569;">متن آماده جهت ارسال در واتساپ، بله یا پیامک عادی:</label>
+                        <div style="display:flex; gap:6px;">
+                            <input type="text" id="vamariz-quick-result-msg" readonly style="width:100%; background:#fff; font-size:12px;">
+                            <button type="button" class="button button-secondary vamariz-copy-link-btn" id="vamariz-quick-copy-msg-btn" data-copy-link="">کپی پیام کامل</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Table Card -->
+        <div class="vamariz-card-box" style="background:#fff; padding:20px; border:1px solid #ccd0d4; border-radius:8px;">
+            <!-- Filter Bar & Search -->
+            <div class="vamariz-filters-row">
+                <div class="vamariz-filter-group">
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=vamariz-installments&tab=orders&order_filter=active')); ?>" 
+                       class="vamariz-filter-btn <?php echo $current_filter === 'active' ? 'active' : ''; ?>">
+                        اقساط فعال و جاری
+                        <span class="vamariz-filter-count"><?php echo esc_html($active_count); ?></span>
+                    </a>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=vamariz-installments&tab=orders&order_filter=overdue')); ?>" 
+                       class="vamariz-filter-btn <?php echo $current_filter === 'overdue' ? 'active' : ''; ?>" style="<?php echo $total_overdue > 0 ? 'color:#b91c1c;' : ''; ?>">
+                        دارای قسط معوقه
+                        <span class="vamariz-filter-count" style="<?php echo $total_overdue > 0 ? 'background:#fee2e2; color:#b91c1c;' : ''; ?>"><?php echo esc_html($total_overdue); ?></span>
+                    </a>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=vamariz-installments&tab=orders&order_filter=completed')); ?>" 
+                       class="vamariz-filter-btn <?php echo $current_filter === 'completed' ? 'active' : ''; ?>">
+                        تسویه‌شده کامل
+                        <span class="vamariz-filter-count"><?php echo esc_html($completed_count); ?></span>
+                    </a>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=vamariz-installments&tab=orders&order_filter=all_valid')); ?>" 
+                       class="vamariz-filter-btn <?php echo $current_filter === 'all_valid' ? 'active' : ''; ?>">
+                        همه سفارش‌های معتبر
+                        <span class="vamariz-filter-count"><?php echo esc_html($valid_orders_count); ?></span>
+                    </a>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=vamariz-installments&tab=orders&order_filter=failed')); ?>" 
+                       class="vamariz-filter-btn <?php echo $current_filter === 'failed' ? 'active' : ''; ?>" style="color:#64748b;">
+                        پیش‌پرداخت ناموفق / انصرافی
+                        <span class="vamariz-filter-count"><?php echo esc_html($failed_count); ?></span>
+                    </a>
+                </div>
+
+                <!-- Search Box -->
+                <form method="get" style="display:flex; gap:6px;">
+                    <input type="hidden" name="page" value="vamariz-installments">
+                    <input type="hidden" name="tab" value="orders">
+                    <input type="hidden" name="order_filter" value="<?php echo esc_attr($current_filter); ?>">
+                    <input type="search" name="s" value="<?php echo esc_attr($search_query); ?>" placeholder="شماره سفارش، نام، موبایل..." style="width:200px; font-size:13px;">
+                    <button type="submit" class="button">جستجو</button>
+                    <?php if (!empty($search_query)) : ?>
+                        <a href="<?php echo esc_url(admin_url('admin.php?page=vamariz-installments&tab=orders&order_filter=' . $current_filter)); ?>" class="button button-link-delete" style="line-height:28px;">پاکسازی</a>
+                    <?php endif; ?>
+                </form>
+            </div>
+
+            <!-- Table -->
+            <table class="wp-list-table widefat fixed striped vamariz-matrix-table">
                 <thead>
                     <tr>
-                        <th style="width: 80px;">سفارش</th>
-                        <th style="width: 140px;">مشتری</th>
-                        <th style="width: 110px;">مبلغ کل</th>
-                        <th>قسط اول (۲۵٪)</th>
-                        <th>قسط دوم (۳۰ روز)</th>
-                        <th>قسط سوم (۶۰ روز)</th>
-                        <th>قسط چهارم (۹۰ روز)</th>
+                        <th style="width: 125px;">سفارش و وضعیت</th>
+                        <th style="width: 150px;">اطلاعات خریدار</th>
+                        <th style="width: 130px;">مبلغ و پیشرفت</th>
+                        <th>قسط اول (پیش‌پرداخت)</th>
+                        <th>قسط دوم (۳۰ روزه)</th>
+                        <th>قسط سوم (۶۰ روزه)</th>
+                        <th>قسط چهارم (۹۰ روزه)</th>
                         <th style="width: 140px;">عملیات</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
-                    if (empty($parent_orders)) {
-                        echo '<tr><td colspan="8" style="text-align:center; padding:20px;">هیچ سفارش اقساطی یافت نشد.</td></tr>';
-                    } else {
-                        foreach ($parent_orders as $po) {
-                            $order_id = $po->get_id();
-                            $name     = trim($po->get_billing_first_name() . ' ' . $po->get_billing_last_name());
-                            $phone    = $po->get_billing_phone();
-                            $total    = number_format((float)$po->get_meta('_vamariz_total_order_amount', true));
-                            $schedule = $po->get_meta('_vamariz_payment_schedule', true);
-
-                            echo '<tr>';
-                            echo '<td><strong><a href="' . esc_url($po->get_edit_order_url()) . '">#' . esc_html($order_id) . '</a></strong></td>';
-                            echo '<td>' . esc_html($name) . '<br><small dir="ltr">' . esc_html($phone) . '</small></td>';
-                            echo '<td>' . esc_html($total) . ' ت</td>';
-
-                            for ($s = 1; $s <= 4; $s++) {
-                                echo '<td>';
-                                if (isset($schedule[$s])) {
-                                    $step_data = $schedule[$s];
-                                    $is_done   = ($step_data['status'] === 'completed');
-                                    $due       = isset($step_data['due_date']) ? (int)$step_data['due_date'] : 0;
-                                    $is_late   = (!$is_done && $due > 0 && $due < $now);
-
-                                    if ($is_done) {
-                                        echo '<span class="vamariz-pill vamariz-pill-success">پرداخت شد</span>';
-                                    } elseif ($is_late) {
-                                        echo '<span class="vamariz-pill vamariz-pill-danger">معوقه (' . date('m/d', $due) . ')</span>';
-                                    } else {
-                                        echo '<span class="vamariz-pill vamariz-pill-pending">سررسید: ' . ($due > 0 ? date('m/d', $due) : '—') . '</span>';
-                                    }
-                                } else {
-                                    echo '—';
-                                }
-                                echo '</td>';
-                            }
-
-                            echo '<td>';
-                            $sub_orders = wc_get_orders(array(
-                                'parent'     => $order_id,
-                                'status'     => array('pending', 'on-hold', 'wc-pending', 'wc-on-hold'),
-                                'meta_key'   => '_vamariz_is_sub_order',
-                                'meta_value' => 'yes',
-                                'limit'      => 1,
-                            ));
-                            if (!empty($sub_orders)) {
-                                $next_sub = reset($sub_orders);
-                                echo '<form method="post" style="display:inline;">';
-                                wp_nonce_field('vamariz_admin_action', 'vamariz_nonce');
-                                echo '<input type="hidden" name="vamariz_action" value="manual_reminder">';
-                                echo '<input type="hidden" name="sub_order_id" value="' . esc_attr($next_sub->get_id()) . '">';
-                                echo '<button type="submit" class="button button-small" onclick="return confirm(\'آیا از ارسال پیامک یادآوری مطمئن هستید؟\');">ارسال پیامک یادآوری</button>';
-                                echo '</form>';
-                            } else {
-                                echo '<span style="color:#46b450;">تسویه کامل</span>';
-                            }
-                            echo '</td>';
-                            echo '</tr>';
+                    if (empty($display_orders)) {
+                        echo '<tr><td colspan="8" style="text-align:center; padding:35px 20px; color:#64748b;">';
+                        if ($current_filter === 'failed') {
+                            echo 'هیچ سفارش ناموفق یا انصرافی ثبت نشده است.';
+                        } else {
+                            echo 'هیچ سفارشی در این دسته‌بندی یافت نشد.';
                         }
+                        echo '</td></tr>';
+                    } else {
+                        foreach ($display_orders as $item) {
+                            $po         = $item['order'];
+                            $order_id   = $po->get_id();
+                            $status     = $po->get_status();
+                            $order_type = $item['order_type'];
+                            $schedule   = $item['schedule'];
+                            $paid_steps = $item['paid_steps'];
+
+                            $name  = trim($po->get_billing_first_name() . ' ' . $po->get_billing_last_name());
+                            if (empty($name)) $name = 'مشتری گرامی';
+                            $phone = $po->get_billing_phone();
+                            $total = (float) $po->get_meta('_vamariz_total_order_amount', true);
+                            if ($total <= 0) $total = (float) $po->get_total() * 4;
+
+                            $pct = ($order_type === 'failed') ? 0 : round(($paid_steps / 4) * 100);
+
+                            // Clean phone for WhatsApp
+                            $clean_phone = preg_replace('/[^\d]/', '', $phone);
+                            if (strpos($clean_phone, '0') === 0) {
+                                $clean_phone = '98' . substr($clean_phone, 1);
+                            }
+                            ?>
+                            <tr style="<?php echo $order_type === 'failed' ? 'background:#fafafa; opacity:0.85;' : ''; ?>">
+                                <!-- 1. Order ID & Status -->
+                                <td>
+                                    <strong>
+                                        <a href="<?php echo esc_url($po->get_edit_order_url()); ?>" title="مشاهده سفارش در ووکامرس">
+                                            #<?php echo esc_html($order_id); ?>
+                                        </a>
+                                    </strong>
+                                    <div style="margin-top:4px;">
+                                        <?php
+                                        if ($order_type === 'failed') {
+                                            echo '<span class="vamariz-pill vamariz-pill-danger">پیش‌پرداخت ناموفق</span>';
+                                        } elseif ($status === 'completed') {
+                                            echo '<span class="vamariz-pill vamariz-pill-success">تکمیل‌شده (تسویه)</span>';
+                                        } elseif ($status === 'processing') {
+                                            echo '<span class="vamariz-pill vamariz-pill-success">پیش‌پرداخت تایید شد</span>';
+                                        } elseif ($status === 'on-hold') {
+                                            echo '<span class="vamariz-pill vamariz-pill-warning">در انتظار بررسی</span>';
+                                        } else {
+                                            echo '<span class="vamariz-pill vamariz-pill-secondary">' . esc_html(wc_get_order_status_name($status)) . '</span>';
+                                        }
+                                        ?>
+                                    </div>
+                                    <span style="font-size:11px; color:#888; display:block; margin-top:4px;">
+                                        <?php echo esc_html($po->get_date_created() ? $po->get_date_created()->date('Y/m/d H:i') : ''); ?>
+                                    </span>
+                                </td>
+
+                                <!-- 2. Customer Info -->
+                                <td>
+                                    <strong style="color:#1e293b;"><?php echo esc_html($name); ?></strong>
+                                    <?php if (!empty($phone)) : ?>
+                                        <div style="margin-top:3px; display:flex; align-items:center; gap:6px;">
+                                            <a href="tel:<?php echo esc_attr($phone); ?>" dir="ltr" style="font-size:12px; font-family:monospace; color:#475569; text-decoration:none;">
+                                                <?php echo esc_html($phone); ?>
+                                            </a>
+                                            <?php if (!empty($clean_phone)) : ?>
+                                                <a href="https://wa.me/<?php echo esc_attr($clean_phone); ?>" target="_blank" class="vamariz-wa-btn" title="ارسال پیام در واتساپ">واتساپ</a>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </td>
+
+                                <!-- 3. Amount & Progress -->
+                                <td>
+                                    <strong><?php echo esc_html(number_format($total)); ?></strong> <small>تومان</small>
+                                    <div class="vamariz-progress-wrap">
+                                        <div class="vamariz-progress-bar-bg">
+                                            <div class="vamariz-progress-bar-fill" style="width: <?php echo esc_attr($pct); ?>%;"></div>
+                                        </div>
+                                        <div class="vamariz-progress-text">
+                                            <span>پیشرفت: <?php echo esc_html($pct); ?>٪</span>
+                                            <span><?php echo esc_html($paid_steps); ?> از ۴ قسط</span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- 4. Steps 1 to 4 -->
+                                <?php
+                                for ($step = 1; $step <= 4; $step++) {
+                                    echo '<td>';
+                                    if ($order_type === 'failed') {
+                                        echo '<div class="vamariz-step-cell is-failed">';
+                                        if ($step === 1) {
+                                            echo '<span class="vamariz-badge-status failed">عدم پرداخت</span>';
+                                            echo '<div class="vamariz-step-date">پیش‌پرداخت ناموفق</div>';
+                                        } else {
+                                            echo '<span style="color:#94a3b8; font-size:11px;">صادر نشده</span>';
+                                        }
+                                        echo '</div>';
+                                    } else {
+                                        $step_data = $schedule[$step] ?? null;
+                                        $is_done   = ($step_data && isset($step_data['status']) && $step_data['status'] === 'completed');
+                                        $due       = isset($step_data['due_date']) ? (int) $step_data['due_date'] : 0;
+                                        $sub_id    = isset($step_data['order_id']) ? (int) $step_data['order_id'] : 0;
+                                        $is_late   = (!$is_done && $due > 0 && $due < $now);
+
+                                        $cell_class = $is_done ? 'is-paid' : ($is_late ? 'is-overdue' : '');
+                                        echo '<div class="vamariz-step-cell ' . esc_attr($cell_class) . '">';
+
+                                        if ($is_done) {
+                                            echo '<span class="vamariz-badge-status paid">✓ پرداخت شد</span>';
+                                            $paid_at = isset($step_data['paid_at']) ? (int) $step_data['paid_at'] : 0;
+                                            if ($paid_at > 0) {
+                                                echo '<div class="vamariz-step-date">' . esc_html(date('Y/m/d', $paid_at)) . '</div>';
+                                            } else {
+                                                echo '<div class="vamariz-step-date">تسویه آنلاین</div>';
+                                            }
+                                        } else {
+                                            if ($is_late) {
+                                                $days_over = max(1, round(($now - $due) / 86400));
+                                                echo '<span class="vamariz-badge-status overdue">معوقه (' . esc_html($days_over) . ' روز)</span>';
+                                            } else {
+                                                echo '<span class="vamariz-badge-status pending">در انتظار</span>';
+                                            }
+
+                                            echo '<div class="vamariz-step-date">سررسید: ' . ($due > 0 ? esc_html(date('m/d', $due)) : '—') . '</div>';
+
+                                            if ($sub_id > 0) {
+                                                $pay_link = home_url('/?vamareys_pay=' . $sub_id);
+                                                echo '<div class="vamariz-step-actions">';
+                                                echo '<button type="button" class="vamariz-copy-link-btn" data-copy-link="' . esc_attr($pay_link) . '" title="کپی لینک مستقیم پرداخت جهت ارسال دستی به مشتری">📋 کپی لینک پرداخت</button>';
+
+                                                // Mark paid manually
+                                                echo '<form method="post" style="display:inline;" onsubmit="return confirm(\'آیا قسط شماره ' . $sub_id . ' به صورت کارت به کارت پرداخت شده و می‌خواهید آن را تسویه ثبت کنید؟\');">';
+                                                wp_nonce_field('vamariz_admin_action', 'vamariz_nonce');
+                                                echo '<input type="hidden" name="vamariz_action" value="mark_installment_paid">';
+                                                echo '<input type="hidden" name="sub_order_id" value="' . esc_attr($sub_id) . '">';
+                                                echo '<button type="submit" class="button button-small" style="font-size:10px; padding:1px 6px; height:auto; color:#059669; border-color:#a7f3d0;" title="ثبت دستی پرداخت (کارت به کارت)">✓ ثبت تسویه</button>';
+                                                echo '</form>';
+                                                echo '</div>';
+                                            }
+                                        }
+                                        echo '</div>';
+                                    }
+                                    echo '</td>';
+                                }
+                                ?>
+
+                                <!-- 5. Global Row Actions -->
+                                <td>
+                                    <?php
+                                    if ($order_type === 'failed') {
+                                        echo '<span style="color:#94a3b8; font-size:12px;">سفارش لغوشده</span>';
+                                    } else {
+                                        // Find next unpaid sub-order
+                                        $sub_orders = wc_get_orders(array(
+                                            'parent'     => $order_id,
+                                            'status'     => array('pending', 'on-hold', 'wc-pending', 'wc-on-hold'),
+                                            'meta_key'   => '_vamariz_is_sub_order',
+                                            'meta_value' => 'yes',
+                                            'limit'      => 1,
+                                            'orderby'    => 'date',
+                                            'order'      => 'ASC',
+                                        ));
+
+                                        if (!empty($sub_orders)) {
+                                            $next_sub  = reset($sub_orders);
+                                            $n_sub_id  = $next_sub->get_id();
+                                            $next_link = home_url('/?vamareys_pay=' . $n_sub_id);
+
+                                            echo '<div style="display:flex; flex-direction:column; gap:5px;">';
+                                            echo '<button type="button" class="button button-secondary vamariz-copy-link-btn" data-copy-link="' . esc_attr($next_link) . '" title="کپی لینک پرداخت قسط جاری">📋 کپی لینک قسط جاری</button>';
+
+                                            echo '<form method="post" style="display:inline;" onsubmit="return confirm(\'آیا از ارسال پیامک یادآوری خدماتی برای مشتری مطمئن هستید؟\');">';
+                                            wp_nonce_field('vamariz_admin_action', 'vamariz_nonce');
+                                            echo '<input type="hidden" name="vamariz_action" value="manual_reminder">';
+                                            echo '<input type="hidden" name="sub_order_id" value="' . esc_attr($n_sub_id) . '">';
+                                            echo '<button type="submit" class="button button-primary button-small" style="width:100%;">✉️ ارسال پیامک یادآوری</button>';
+                                            echo '</form>';
+                                            echo '</div>';
+                                        } else {
+                                            echo '<span class="vamariz-pill vamariz-pill-success" style="font-size:12px;">🎉 تسویه کامل ۴ قسط</span>';
+                                        }
+                                    }
+                                    ?>
+                                </td>
+                            </tr>
+                        <?php }
                     }
                     ?>
                 </tbody>

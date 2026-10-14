@@ -250,6 +250,34 @@ class Vamariz_Engine {
         // If this is a child sub-order that was paid
         $is_sub = $order->get_meta('_vamariz_is_sub_order', true);
         if ($is_sub === 'yes') {
+            $parent_id = (int) $order->get_meta('_vamariz_parent_order_id', true);
+            $step      = (int) $order->get_meta('_vamariz_installment_step', true);
+
+            if ($parent_id > 0 && function_exists('wc_get_order')) {
+                $parent = wc_get_order($parent_id);
+                if ($parent) {
+                    $schedule = $parent->get_meta('_vamariz_payment_schedule', true);
+                    if (is_array($schedule) && isset($schedule[$step])) {
+                        $schedule[$step]['status']  = 'completed';
+                        $schedule[$step]['paid_at'] = current_time('timestamp');
+                        $parent->update_meta_data('_vamariz_payment_schedule', $schedule);
+
+                        // Check if all 4 installments are completed
+                        $all_done = true;
+                        for ($s = 1; $s <= 4; $s++) {
+                            if (!isset($schedule[$s]['status']) || $schedule[$s]['status'] !== 'completed') {
+                                $all_done = false;
+                                break;
+                            }
+                        }
+                        if ($all_done) {
+                            $parent->update_status('completed', __('تمامی اقساط ۴ ماهه واماریز با موفقیت تسویه گردید.', 'vamariz-installments'));
+                        }
+                        $parent->save();
+                    }
+                }
+            }
+
             $receipt_sent = $order->get_meta('_vamariz_receipt_sent', true);
             if ($receipt_sent !== 'yes') {
                 Vamariz_SMS::send_payment_receipt_sms($order_id);
