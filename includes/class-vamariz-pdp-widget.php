@@ -251,7 +251,7 @@ class Vamariz_PDP_Widget {
                             class="vamariz-modal-close" 
                             id="vamariz-modal-close-btn" 
                             aria-label="<?php esc_attr_e('بستن پنجره', 'vamariz-installments'); ?>">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="5" x2="5" y2="19"></line><line x1="5" y1="5" x2="19" y2="19"></line></svg>
                     </button>
                 </div>
 

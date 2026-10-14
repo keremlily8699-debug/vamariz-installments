@@ -136,7 +136,7 @@ jQuery(document).ready(function ($) {
         $modalOverlay.css('display', 'flex').hide().fadeIn(220, function () {
             $modalOverlay.attr('aria-hidden', 'false');
             $triggerBtn.attr('aria-expanded', 'true');
-            $closeBtn.focus();
+            $modalDialog.focus();
         });
         $('body').css('overflow', 'hidden');
     }

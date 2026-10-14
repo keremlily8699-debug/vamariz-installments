@@ -175,40 +175,49 @@
     align-items: center;
 }
 
-.vamariz-modal-trigger {
-    background: #ffffff;
-    border: 1.5px solid var(--vmz-text-dark);
-    color: var(--vmz-text-dark);
-    padding: 10px 22px;
-    min-height: 44px;
-    border-radius: 9999px;
-    font-size: 13.5px;
-    font-weight: 700;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-    font-family: inherit;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+.vamariz-installment-widget button.vamariz-modal-trigger,
+.vamariz-installment-widget #vamariz-open-modal-btn,
+button.vamariz-modal-trigger {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    border: 1.5px solid var(--vmz-text-dark) !important;
+    color: var(--vmz-text-dark) !important;
+    padding: 9px 20px !important;
+    min-height: 42px !important;
+    border-radius: 9999px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    font-family: inherit !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    line-height: 1 !important;
+    outline: none !important;
 }
 
 .vamariz-modal-trigger svg {
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease !important;
 }
 
-.vamariz-modal-trigger:hover,
-.vamariz-modal-trigger:focus {
-    background: var(--vmz-text-dark);
-    color: #ffffff;
-    border-color: var(--vmz-text-dark);
-    box-shadow: 0 4px 16px rgba(24, 24, 27, 0.22);
-    outline: none;
-    transform: translateY(-1px);
+.vamariz-installment-widget button.vamariz-modal-trigger:hover,
+.vamariz-installment-widget #vamariz-open-modal-btn:hover,
+button.vamariz-modal-trigger:hover {
+    background: var(--vmz-text-dark) !important;
+    background-color: var(--vmz-text-dark) !important;
+    color: #ffffff !important;
+    border-color: var(--vmz-text-dark) !important;
+    box-shadow: 0 4px 16px rgba(24, 24, 27, 0.22) !important;
+    transform: translateY(-1px) !important;
 }
 
 .vamariz-modal-trigger:hover svg {
-    transform: translateX(-3px);
+    transform: translateX(-3px) !important;
 }
 
 /* Mini 4-Stage Stepper Track */
@@ -384,14 +393,20 @@
     font-weight: 500;
 }
 
-/* Accessible Close Button (Generous 46px target, circular, prominent cross) */
-.vamariz-modal-close {
-    width: 46px !important;
-    height: 46px !important;
-    min-width: 46px !important;
-    min-height: 46px !important;
+/* Accessible Close Button (Circular 44px target, soft grey, prominent cross) */
+.vamariz-modal-dialog button.vamariz-modal-close,
+.vamariz-modal-header button.vamariz-modal-close,
+button.vamariz-modal-close,
+#vamariz-modal-close-btn {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
     border-radius: 50% !important;
     background: #f4f4f6 !important;
+    background-color: #f4f4f6 !important;
     border: 1px solid #e4e4e7 !important;
     color: #18181b !important;
     cursor: pointer !important;
@@ -403,33 +418,67 @@
     margin: 0 !important;
     flex-shrink: 0 !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    outline: none !important;
 }
 
-.vamariz-modal-close svg {
-    width: 24px !important;
-    height: 24px !important;
-    min-width: 24px !important;
-    min-height: 24px !important;
+.vamariz-modal-dialog button.vamariz-modal-close svg,
+button.vamariz-modal-close svg {
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    min-height: 22px !important;
     stroke: currentColor !important;
-    stroke-width: 2.6px !important;
+    stroke-width: 2.8px !important;
     display: block !important;
+    pointer-events: none !important;
     transition: transform 0.2s ease !important;
 }
 
-.vamariz-modal-close:hover,
-.vamariz-modal-close:focus {
+/* Accessible focus: keep soft background and add gentle gold ring */
+.vamariz-modal-dialog button.vamariz-modal-close:focus,
+button.vamariz-modal-close:focus {
+    background: #f4f4f6 !important;
+    background-color: #f4f4f6 !important;
+    color: #18181b !important;
+    border-color: var(--vmz-accent-gold) !important;
+    box-shadow: 0 0 0 3px rgba(180, 155, 120, 0.25) !important;
+    outline: none !important;
+}
+
+/* Hover: turn obsidian black with pure white cross */
+.vamariz-modal-dialog button.vamariz-modal-close:hover,
+button.vamariz-modal-close:hover {
     background: #18181b !important;
+    background-color: #18181b !important;
     color: #ffffff !important;
     border-color: #18181b !important;
     box-shadow: 0 4px 12px rgba(24, 24, 27, 0.25) !important;
     transform: rotate(90deg) scale(1.06) !important;
-    outline: none !important;
 }
 
 .vamariz-modal-body {
     padding: 22px 24px;
     overflow-y: auto;
     flex-grow: 1;
+    scrollbar-width: thin;
+    scrollbar-color: #d4cfc7 transparent;
+}
+
+.vamariz-modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.vamariz-modal-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.vamariz-modal-body::-webkit-scrollbar-thumb {
+    background: #d4cfc7;
+    border-radius: 10px;
+}
+
+.vamariz-modal-body::-webkit-scrollbar-thumb:hover {
+    background: var(--vmz-accent-gold);
 }
 
 /* ==========================================================================
@@ -686,28 +735,41 @@
     flex-shrink: 0;
 }
 
-.vamariz-btn-primary {
-    background: var(--vmz-text-dark);
-    color: #ffffff;
-    border: none;
-    padding: 12px 28px;
-    min-height: 46px;
-    border-radius: 9999px;
-    font-size: 13.5px;
-    font-weight: 700;
-    cursor: pointer;
-    font-family: inherit;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 6px rgba(24, 24, 27, 0.18);
-    width: 100%;
+.vamariz-modal-footer button.vamariz-btn-primary,
+.vamariz-modal-footer #vamariz-close-modal-confirm,
+button.vamariz-btn-primary {
+    background: #18181b !important;
+    background-color: #18181b !important;
+    color: #ffffff !important;
+    border: 1.5px solid #18181b !important;
+    padding: 12px 28px !important;
+    min-height: 48px !important;
+    border-radius: 9999px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    font-family: inherit !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 4px 14px rgba(24, 24, 27, 0.2) !important;
+    width: 100% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    outline: none !important;
+    letter-spacing: 0 !important;
+    line-height: 1 !important;
+    text-transform: none !important;
 }
 
-.vamariz-btn-primary:hover,
-.vamariz-btn-primary:focus {
-    background: #27272a;
-    box-shadow: 0 4px 14px rgba(24, 24, 27, 0.28);
-    outline: none;
-    transform: translateY(-1px);
+.vamariz-modal-footer button.vamariz-btn-primary:hover,
+.vamariz-modal-footer #vamariz-close-modal-confirm:hover,
+button.vamariz-btn-primary:hover {
+    background: #27272a !important;
+    background-color: #27272a !important;
+    border-color: #27272a !important;
+    box-shadow: 0 6px 18px rgba(24, 24, 27, 0.3) !important;
+    transform: translateY(-1px) !important;
 }
 
 /* ==========================================================================
