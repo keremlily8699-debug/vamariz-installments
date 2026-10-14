@@ -93,14 +93,18 @@ add_action('wp_head', function () {
 
 
 // ============================================================================
-// اسنیپت شماره ۳: ارسال پیامک سریع ملی‌پیامک (تابع کمکی)
+// اسنیپت شماره ۳: ارسال پیامک با وب‌سرویس خدماتی الگو (BaseServiceNumber) ملی‌پیامک
 // محل اجرا: Run Everywhere
 // ============================================================================
-function vamariz_send_melipayamak_sms($to, $text) {
-    $api_url = 'https://console.melipayamak.com/api/send/simple/1cf6abc67a3c471e9a61c617e82e394f';
-    $from    = '50004001';
+function vamariz_send_melipayamak_pattern_sms($to, $body_id, array $variables = array()) {
+    $username = get_option('vamariz_sms_username', '');
+    $password = get_option('vamariz_sms_password', '');
 
-    // نرمال‌سازی شماره
+    if (empty($username) || empty($password)) {
+        return array('success' => false, 'message' => 'نام کاربری یا کلمه عبور ملی‌پیامک ثبت نشده است.');
+    }
+
+    // نرمال‌سازی شماره گیرنده
     $persian = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
     $arabic  = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
     $english = ['0','1','2','3','4','5','6','7','8','9'];
@@ -111,24 +115,68 @@ function vamariz_send_melipayamak_sms($to, $text) {
     elseif (strpos($phone, '98') === 0 && strlen($phone) === 12) $phone = substr($phone, 2);
     if (strpos($phone, '9') === 0 && strlen($phone) === 10) $phone = '0' . $phone;
 
-    $payload = [
-        'from' => $from,
-        'to'   => $phone,
-        'text' => $text,
-    ];
-
-    $response = wp_remote_post($api_url, [
-        'method'    => 'POST',
-        'timeout'   => 15,
-        'headers'   => ['Content-Type' => 'application/json'],
-        'body'      => wp_json_encode($payload),
-        'sslverify' => false,
-    ]);
-
-    if (is_wp_error($response)) {
-        return ['success' => false, 'message' => $response->get_error_message()];
+    // پاکسازی متغیرها و حذف پروتکل جهت جلوگیری از خطای ۱۰-
+    $cleaned = array();
+    foreach ($variables as $v) {
+        $val = strip_tags((string)$v);
+        $val = preg_replace('#^https?://#i', '', $val);
+        $val = str_replace([';', "\r", "\n"], [' ', ' ', ' '], $val);
+        $cleaned[] = trim($val);
     }
 
-    $body = json_decode(wp_remote_retrieve_body($response), true);
-    return ['success' => true, 'response' => $body];
+    $payload = array(
+        'username' => $username,
+        'password' => $password,
+        'text'     => implode(';', $cleaned),
+        'to'       => $phone,
+        'bodyId'   => absint($body_id),
+    );
+
+    $response = wp_remote_post('https://rest.payamak-panel.com/api/SendSMS/BaseServiceNumber', array(
+        'method'    => 'POST',
+        'timeout'   => 15,
+        'headers'   => array('Content-Type' => 'application/json', 'Accept' => 'application/json'),
+        'body'      => wp_json_encode($payload),
+        'sslverify' => false,
+    ));
+
+    if (is_wp_error($response)) {
+        return array('success' => false, 'message' => $response->get_error_message());
+    }
+
+    $data = json_decode(wp_remote_retrieve_body($response), true);
+    if (isset($data['RetStatus']) && (int)$data['RetStatus'] === 1) {
+        return array('success' => true, 'recId' => $data['Value'] ?? '');
+    }
+
+    return array('success' => false, 'code' => $data['Value'] ?? '', 'message' => 'خطا در ارسال پیامک خدماتی.');
 }
+
+
+// ============================================================================
+// اسنیپت شماره ۴: ریدایرکت مستقیم پرداخت اقساط (?vamariz_pay=ID)
+// محل اجرا: Run Everywhere
+// ============================================================================
+add_action('init', function () {
+    if (!empty($_GET['vamariz_pay'])) {
+        $sub_id = absint($_GET['vamariz_pay']);
+        if ($sub_id > 0 && function_exists('wc_get_order')) {
+            $order = wc_get_order($sub_id);
+            if ($order) {
+                if ($order->is_paid() || in_array($order->get_status(), array('processing', 'completed'), true)) {
+                    $view_url = method_exists($order, 'get_view_order_url') ? $order->get_view_order_url() : wc_get_account_endpoint_url('orders');
+                    if (function_exists('wc_add_notice')) {
+                        wc_add_notice('این قسط قبلاً با موفقیت تسویه شده است.', 'success');
+                    }
+                    wp_safe_redirect($view_url);
+                    exit;
+                }
+                $pay_url = method_exists($order, 'get_checkout_payment_url') ? $order->get_checkout_payment_url() : '';
+                if (!empty($pay_url)) {
+                    wp_redirect($pay_url);
+                    exit;
+                }
+            }
+        }
+    }
+});
