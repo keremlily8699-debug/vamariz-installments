@@ -81,6 +81,15 @@ class Vamariz_PDP_Widget {
     }
 
     /**
+     * Helper to format numbers to Persian digits.
+     */
+    public static function to_fa_digits($number) {
+        $en = array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
+        $fa = array('۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹');
+        return str_replace($en, $fa, (string) $number);
+    }
+
+    /**
      * Render the 4-installment widget on single product page.
      */
     public function render_pdp_widget() {
@@ -97,27 +106,51 @@ class Vamariz_PDP_Widget {
         }
 
         $installment_amount = $price > 0 ? round($price / 4) : 0;
+        $formatted_fa = self::to_fa_digits(number_format($installment_amount));
         ?>
-        <div class="vamariz-installment-widget" id="vamariz-installment-widget">
-            <div class="vamariz-widget-badge">
-                <span class="vamariz-badge-dot"></span>
-                <span><?php esc_html_e('خرید اقساطی اختصاصی واماریز', 'vamariz-installments'); ?></span>
+        <div class="vamariz-installment-widget" id="vamariz-installment-widget" aria-label="<?php esc_attr_e('طرح خرید اقساطی ۴ ماهه واماریز', 'vamariz-installments'); ?>">
+            <div class="vamariz-widget-header-row">
+                <div class="vamariz-widget-badge">
+                    <span class="vamariz-badge-dot"></span>
+                    <span><?php esc_html_e('خرید اقساطی اختصاصی واماریز', 'vamariz-installments'); ?></span>
+                </div>
+                <div class="vamariz-upfront-badge">
+                    <span><?php esc_html_e('پیش‌پرداخت امروز: فقط ۲۵٪', 'vamariz-installments'); ?></span>
+                </div>
             </div>
+
             <div class="vamariz-widget-content">
                 <div class="vamariz-widget-text">
                     <span class="vamariz-widget-title"><?php esc_html_e('در ۴ قسط ماهانه:', 'vamariz-installments'); ?></span>
                     <span class="vamariz-installment-amount" data-raw="<?php echo esc_attr($installment_amount); ?>">
-                        <strong class="vamariz-calc-installment"><?php echo esc_html(number_format($installment_amount)); ?></strong>
+                        <strong class="vamariz-calc-installment"><?php echo esc_html($formatted_fa); ?></strong>
                         <span class="vamariz-currency"><?php esc_html_e('تومان / ماه', 'vamariz-installments'); ?></span>
                     </span>
                 </div>
-                <button type="button" class="vamariz-modal-trigger" id="vamariz-open-modal-btn">
-                    <span><?php esc_html_e('شرایط و مراحل اقساط', 'vamariz-installments'); ?></span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                <button type="button" 
+                        class="vamariz-modal-trigger" 
+                        id="vamariz-open-modal-btn" 
+                        aria-haspopup="dialog" 
+                        aria-expanded="false" 
+                        aria-controls="vamariz-modal-dialog">
+                    <span><?php esc_html_e('شرایط و جدول اقساط', 'vamariz-installments'); ?></span>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
                 </button>
             </div>
+
             <div class="vamariz-widget-sub">
-                <?php esc_html_e('۲۵٪ در لحظه خرید + ارسال فوری کالا + ۳ قسط ماهانه بدون سود و ضامن', 'vamariz-installments'); ?>
+                <span class="vamariz-sub-pill">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <?php esc_html_e('ارسال فوری کالا پس از پرداخت اول', 'vamariz-installments'); ?>
+                </span>
+                <span class="vamariz-sub-pill">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <?php esc_html_e('بدون سود و کارمزد اضافه', 'vamariz-installments'); ?>
+                </span>
+                <span class="vamariz-sub-pill">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <?php esc_html_e('بدون نیاز به چک یا ضامن', 'vamariz-installments'); ?>
+                </span>
             </div>
         </div>
         <?php
@@ -134,46 +167,70 @@ class Vamariz_PDP_Widget {
         global $product;
         $price = ($product && is_a($product, 'WC_Product')) ? (float) (function_exists('wc_get_price_to_display') ? wc_get_price_to_display($product) : $product->get_price()) : 0;
         $quarter = $price > 0 ? round($price / 4) : 0;
+
+        $price_fa   = self::to_fa_digits(number_format($price));
+        $quarter_fa = self::to_fa_digits(number_format($quarter));
         ?>
-        <div class="vamariz-modal-overlay" id="vamariz-modal-overlay" style="display:none;">
-            <div class="vamariz-modal-dialog">
+        <div class="vamariz-modal-overlay" id="vamariz-modal-overlay" style="display:none;" aria-hidden="true">
+            <div class="vamariz-modal-dialog" 
+                 id="vamariz-modal-dialog" 
+                 role="dialog" 
+                 aria-modal="true" 
+                 aria-labelledby="vamariz-modal-title" 
+                 aria-describedby="vamariz-modal-desc" 
+                 tabindex="-1">
+                
                 <div class="vamariz-modal-header">
                     <div class="vamariz-header-title">
-                        <span class="vamariz-logo-icon">V</span>
-                        <h3><?php esc_html_e('خرید اقساطی ۴ ماهه واماریز', 'vamariz-installments'); ?></h3>
+                        <div class="vamariz-fintech-icon" aria-hidden="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line><line x1="5" y1="15" x2="8" y2="15"></line></svg>
+                        </div>
+                        <div>
+                            <h3 id="vamariz-modal-title"><?php esc_html_e('طرح خرید اقساطی ۴ ماهه واماریز', 'vamariz-installments'); ?></h3>
+                            <span class="vamariz-header-sub"><?php esc_html_e('بدون سود، بدون ضامن، با ارسال آنی سفارش', 'vamariz-installments'); ?></span>
+                        </div>
                     </div>
-                    <button type="button" class="vamariz-modal-close" id="vamariz-modal-close-btn">&times;</button>
+                    <button type="button" 
+                            class="vamariz-modal-close" 
+                            id="vamariz-modal-close-btn" 
+                            aria-label="<?php esc_attr_e('بستن پنجره جزئیات اقساط', 'vamariz-installments'); ?>">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
                 </div>
 
-                <div class="vamariz-modal-body">
+                <div class="vamariz-modal-body" id="vamariz-modal-desc">
                     <!-- Dynamic Installment Breakdown Table -->
                     <div class="vamariz-breakdown-card">
                         <div class="vamariz-card-header">
-                            <span><?php esc_html_e('محاسبه لحظه‌ای اقساط این محصول', 'vamariz-installments'); ?></span>
+                            <span class="vamariz-card-header-label">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                <?php esc_html_e('محاسبه دقیق سررسید و مبالغ اقساط این کالا', 'vamariz-installments'); ?>
+                            </span>
                             <span class="vamariz-total-pill">
-                                <?php esc_html_e('قیمت کالا:', 'vamariz-installments'); ?>
-                                <strong class="vamariz-modal-total-display"><?php echo esc_html(number_format($price)); ?></strong> <?php esc_html_e('تومان', 'vamariz-installments'); ?>
+                                <?php esc_html_e('قیمت کل کالا:', 'vamariz-installments'); ?>
+                                <strong class="vamariz-modal-total-display"><?php echo esc_html($price_fa); ?></strong> <?php esc_html_e('تومان', 'vamariz-installments'); ?>
                             </span>
                         </div>
                         <div class="vamariz-steps-grid">
                             <div class="vamariz-step-item active-step">
-                                <span class="vamariz-step-num"><?php esc_html_e('قسط اول', 'vamariz-installments'); ?></span>
-                                <span class="vamariz-step-amount"><strong class="vamariz-modal-inst-1"><?php echo esc_html(number_format($quarter)); ?></strong> تومان</span>
-                                <span class="vamariz-step-date"><?php esc_html_e('امروز (هنگام خرید)', 'vamariz-installments'); ?></span>
+                                <span class="vamariz-step-badge"><?php esc_html_e('پیش‌پرداخت', 'vamariz-installments'); ?></span>
+                                <span class="vamariz-step-num"><?php esc_html_e('قسط اول (۲۵٪)', 'vamariz-installments'); ?></span>
+                                <span class="vamariz-step-amount"><strong class="vamariz-modal-inst-1"><?php echo esc_html($quarter_fa); ?></strong> <small>تومان</small></span>
+                                <span class="vamariz-step-date highlight-date"><?php esc_html_e('امروز (هنگام خرید)', 'vamariz-installments'); ?></span>
                             </div>
                             <div class="vamariz-step-item">
-                                <span class="vamariz-step-num"><?php esc_html_e('قسط دوم', 'vamariz-installments'); ?></span>
-                                <span class="vamariz-step-amount"><strong class="vamariz-modal-inst-2"><?php echo esc_html(number_format($quarter)); ?></strong> تومان</span>
+                                <span class="vamariz-step-num"><?php esc_html_e('قسط دوم (۲۵٪)', 'vamariz-installments'); ?></span>
+                                <span class="vamariz-step-amount"><strong class="vamariz-modal-inst-2"><?php echo esc_html($quarter_fa); ?></strong> <small>تومان</small></span>
                                 <span class="vamariz-step-date"><?php esc_html_e('۳۰ روز بعد', 'vamariz-installments'); ?></span>
                             </div>
                             <div class="vamariz-step-item">
-                                <span class="vamariz-step-num"><?php esc_html_e('قسط سوم', 'vamariz-installments'); ?></span>
-                                <span class="vamariz-step-amount"><strong class="vamariz-modal-inst-3"><?php echo esc_html(number_format($quarter)); ?></strong> تومان</span>
+                                <span class="vamariz-step-num"><?php esc_html_e('قسط سوم (۲۵٪)', 'vamariz-installments'); ?></span>
+                                <span class="vamariz-step-amount"><strong class="vamariz-modal-inst-3"><?php echo esc_html($quarter_fa); ?></strong> <small>تومان</small></span>
                                 <span class="vamariz-step-date"><?php esc_html_e('۶۰ روز بعد', 'vamariz-installments'); ?></span>
                             </div>
                             <div class="vamariz-step-item">
-                                <span class="vamariz-step-num"><?php esc_html_e('قسط چهارم', 'vamariz-installments'); ?></span>
-                                <span class="vamariz-step-amount"><strong class="vamariz-modal-inst-4"><?php echo esc_html(number_format($quarter)); ?></strong> تومان</span>
+                                <span class="vamariz-step-num"><?php esc_html_e('قسط چهارم (۲۵٪)', 'vamariz-installments'); ?></span>
+                                <span class="vamariz-step-amount"><strong class="vamariz-modal-inst-4"><?php echo esc_html($quarter_fa); ?></strong> <small>تومان</small></span>
                                 <span class="vamariz-step-date"><?php esc_html_e('۹۰ روز بعد', 'vamariz-installments'); ?></span>
                             </div>
                         </div>
@@ -184,24 +241,24 @@ class Vamariz_PDP_Widget {
                         <h4><?php esc_html_e('مراحل دریافت کالا و پرداخت اقساط', 'vamariz-installments'); ?></h4>
                         <ul class="vamariz-info-steps">
                             <li>
-                                <div class="vamariz-circle-num">۱</div>
+                                <div class="vamariz-circle-num" aria-hidden="true">۱</div>
                                 <div>
-                                    <strong><?php esc_html_e('ثبت سفارش و پرداخت قسط اول', 'vamariz-installments'); ?></strong>
-                                    <p><?php esc_html_e('تنها با پرداخت ۲۵٪ از مبلغ کل کالا در صفحه تسویه‌حساب، سفارش شما ثبت می‌شود.', 'vamariz-installments'); ?></p>
+                                    <strong><?php esc_html_e('ثبت سفارش و پرداخت قسط اول (۲۵٪)', 'vamariz-installments'); ?></strong>
+                                    <p><?php esc_html_e('در صفحه تسویه‌حساب گزینه خرید اقساطی واماریز را انتخاب کرده و تنها ۲۵٪ مبلغ را به صورت آنلاین واریز کنید.', 'vamariz-installments'); ?></p>
                                 </div>
                             </li>
                             <li>
-                                <div class="vamariz-circle-num">۲</div>
+                                <div class="vamariz-circle-num" aria-hidden="true">۲</div>
                                 <div>
-                                    <strong><?php esc_html_e('ارسال فوری کالا توسط واماریز', 'vamariz-installments'); ?></strong>
-                                    <p><?php esc_html_e('سفارش شما بلافاصله پس از پرداخت قسط اول بسته‌بندی و تحویل پست / پیک می‌گردد.', 'vamariz-installments'); ?></p>
+                                    <strong><?php esc_html_e('ارسال فوری و کامل کالا توسط واماریز', 'vamariz-installments'); ?></strong>
+                                    <p><?php esc_html_e('نیازی به تسویه کامل برای دریافت کالا نیست! سفارش شما بلافاصله پس از پرداخت قسط اول بسته‌بندی و تحویل پست / پیک می‌گردد.', 'vamariz-installments'); ?></p>
                                 </div>
                             </li>
                             <li>
-                                <div class="vamariz-circle-num">۳</div>
+                                <div class="vamariz-circle-num" aria-hidden="true">۳</div>
                                 <div>
-                                    <strong><?php esc_html_e('یادآوری پیامکی و پرداخت آنلاین آسان', 'vamariz-installments'); ?></strong>
-                                    <p><?php esc_html_e('پیش از موعد هر قسط، پیامک یادآوری حاوی لینک مستقیم پرداخت بانکی برای شما ارسال خواهد شد.', 'vamariz-installments'); ?></p>
+                                    <strong><?php esc_html_e('یادآوری خودکار و پرداخت آسان آنلاین', 'vamariz-installments'); ?></strong>
+                                    <p><?php esc_html_e('۳ روز پیش از موعد هر قسط و در روز سررسید، پیامک یادآوری حاوی لینک مستقیم تسویه برای شما ارسال خواهد شد.', 'vamariz-installments'); ?></p>
                                 </div>
                             </li>
                         </ul>
@@ -209,14 +266,17 @@ class Vamariz_PDP_Widget {
 
                     <!-- Terms & Conditions -->
                     <div class="vamariz-terms-box">
-                        <strong><?php esc_html_e('شرایط و قوانین خوش‌حسابی:', 'vamariz-installments'); ?></strong>
-                        <p><?php esc_html_e('این طرح ویژه مشتریان منتخب و وفادار واماریز بوده و بدون نیاز به چک، سفته یا ضامن ارائه می‌شود. در صورت تاخیر در تسویه هر قسط، امتیاز خرید اقساطی بعدی به صورت موقت معلق خواهد شد تا اقساط معوقه تسویه گردند.', 'vamariz-installments'); ?></p>
+                        <strong>
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                            <?php esc_html_e('شرایط و قوانین خوش‌حسابی:', 'vamariz-installments'); ?>
+                        </strong>
+                        <p><?php esc_html_e('این طرح ویژه مشتریان خوش‌حساب واماریز بوده و بدون نیاز به چک، سفته یا ضامن ارائه می‌شود. در صورت تاخیر در تسویه هر قسط، امتیاز ثبت خریدهای اقساطی بعدی به صورت موقت معلق خواهد شد تا اقساط معوقه تسویه گردند.', 'vamariz-installments'); ?></p>
                     </div>
                 </div>
 
                 <div class="vamariz-modal-footer">
                     <button type="button" class="vamariz-btn-primary" id="vamariz-close-modal-confirm">
-                        <?php esc_html_e('متوجه شدم، بازگشت به خرید', 'vamariz-installments'); ?>
+                        <?php esc_html_e('متوجه شدم، بازگشت به خرید کالا', 'vamariz-installments'); ?>
                     </button>
                 </div>
             </div>
