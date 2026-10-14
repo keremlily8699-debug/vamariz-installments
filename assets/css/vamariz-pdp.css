@@ -1,162 +1,296 @@
 /**
- * Vamareys PDP Widget & Modal Styles
+ * Vamareys Single Product Page Installment Widget & Modal Styles
+ * Luxury Fintech Design System for Fashion eCommerce
  * Direction: RTL
- * Modern Fintech Style (WCAG 2.1 AA Compliant)
+ * Fully Compliant with WCAG 2.1 AA Contrast & Touch Targets
  */
 
 :root {
-    --vmz-primary: #059669;
-    --vmz-primary-dark: #047857;
-    --vmz-primary-light: #ecfdf5;
-    --vmz-primary-border: #a7f3d0;
-    --vmz-text-dark: #0f172a;
-    --vmz-text-body: #334155;
-    --vmz-text-muted: #475569;
-    --vmz-border-subtle: #e2e8f0;
-    --vmz-bg-subtle: #f8fafc;
+    /* Brand & Accent Tokens (Cohesive with Vamareys & Woodmart) */
+    --vmz-brand: #cfbfb2;
+    --vmz-brand-dark: #a89484;
+    --vmz-accent-gold: #b49b78;
+    --vmz-accent-gold-dark: #8c7353;
+    --vmz-accent-gold-light: #fdfaf6;
+    --vmz-accent-gold-border: #ede4d8;
+
+    /* Semantic Status Tokens */
+    --vmz-success: #15803d;
+    --vmz-success-light: #f0fdf4;
+    --vmz-success-border: #bbf7d0;
+
+    /* Surfaces & Neutrals */
+    --vmz-surface-card: #ffffff;
+    --vmz-surface-subtle: #fbfaf8;
+    --vmz-surface-highlight: #f5f2eb;
+    --vmz-border-subtle: #ece8e1;
+    --vmz-border-strong: #ded8ce;
+
+    /* Typography Hierarchy */
+    --vmz-text-dark: #18181b;
+    --vmz-text-body: #3f3f46;
+    --vmz-text-muted: #71717a;
+
+    /* Elevation & Shadows */
+    --vmz-shadow-sm: 0 1px 3px rgba(24, 24, 27, 0.04), 0 1px 2px rgba(24, 24, 27, 0.02);
+    --vmz-shadow-card: 0 4px 20px -2px rgba(24, 24, 27, 0.05), 0 1px 3px rgba(24, 24, 27, 0.02);
+    --vmz-shadow-modal: 0 25px 60px -12px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.04);
 }
 
 /* ==========================================================================
-   1. Single Product Page Widget
+   1. Single Product Page Installment Widget
    ========================================================================== */
 
 .vamariz-installment-widget {
-    background: #ffffff;
-    border: 1px solid var(--vmz-primary-border);
-    border-radius: 12px;
-    padding: 16px 20px;
-    margin: 20px 0;
-    box-shadow: 0 4px 20px -2px rgba(5, 150, 105, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03);
+    background: var(--vmz-surface-card);
+    border: 1px solid var(--vmz-border-subtle);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin: 22px 0;
+    box-shadow: var(--vmz-shadow-card);
     direction: rtl;
     text-align: right;
     font-family: inherit;
-    transition: all 0.25s ease;
+    font-feature-settings: "tnum" 1, "ss01" 1;
+    position: relative;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .vamariz-installment-widget:hover {
-    border-color: #34d399;
-    box-shadow: 0 6px 24px -2px rgba(5, 150, 105, 0.12);
+    border-color: var(--vmz-brand-dark);
+    box-shadow: 0 6px 24px -2px rgba(24, 24, 27, 0.08);
 }
 
-.vamariz-widget-header-row {
+/* Header Row: Brand Pill & Prepayment Badge */
+.vamariz-widget-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 12px;
+    gap: 10px;
+    margin-bottom: 14px;
 }
 
-.vamariz-widget-badge {
+.vamariz-brand-tag {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 7px;
     font-size: 12px;
     font-weight: 700;
-    color: var(--vmz-primary-dark);
-    background: var(--vmz-primary-light);
-    padding: 4px 12px;
+    color: var(--vmz-text-dark);
+    background: var(--vmz-surface-subtle);
+    padding: 5px 12px;
     border-radius: 20px;
-    border: 1px solid #d1fae5;
+    border: 1px solid var(--vmz-border-subtle);
 }
 
-.vamariz-badge-dot {
+.vamariz-brand-dot {
     width: 7px;
     height: 7px;
-    background-color: var(--vmz-primary);
+    background-color: var(--vmz-accent-gold);
     border-radius: 50%;
     display: inline-block;
-    box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.2);
+    box-shadow: 0 0 0 2px rgba(180, 155, 120, 0.25);
+}
+
+.vamariz-brand-name {
+    font-weight: 800;
+    letter-spacing: -0.2px;
+}
+
+.vamariz-brand-divider {
+    color: #cbd5e1;
+    font-weight: 400;
+}
+
+.vamariz-brand-plan {
+    color: var(--vmz-text-body);
+    font-weight: 600;
 }
 
 .vamariz-upfront-badge {
     display: inline-flex;
     align-items: center;
-    font-size: 12px;
+    gap: 5px;
+    font-size: 11.5px;
     font-weight: 700;
-    color: #0369a1;
-    background: #f0f9ff;
-    padding: 4px 10px;
+    color: var(--vmz-accent-gold-dark);
+    background: var(--vmz-accent-gold-light);
+    padding: 4px 11px;
     border-radius: 20px;
-    border: 1px solid #bae6fd;
+    border: 1px solid var(--vmz-accent-gold-border);
 }
 
-.vamariz-widget-content {
+/* Main Section: Price Block & Action Button */
+.vamariz-widget-main {
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 14px;
+    gap: 16px;
+    margin-bottom: 14px;
 }
 
-.vamariz-widget-text {
+.vamariz-price-block {
     display: flex;
-    align-items: baseline;
-    gap: 8px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 3px;
 }
 
-.vamariz-widget-title {
-    font-size: 14px;
+.vamariz-price-label {
+    font-size: 12.5px;
     color: var(--vmz-text-muted);
     font-weight: 600;
 }
 
-.vamariz-installment-amount strong {
-    font-size: 21px;
-    font-weight: 800;
-    color: var(--vmz-primary-dark);
-    letter-spacing: -0.5px;
+.vamariz-amount-wrapper {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
 }
 
-.vamariz-currency {
+.vamariz-calc-installment {
+    font-size: 23px;
+    font-weight: 900;
+    color: var(--vmz-text-dark);
+    letter-spacing: -0.5px;
+    line-height: 1.15;
+}
+
+.vamariz-currency-unit {
     font-size: 13px;
     color: var(--vmz-text-muted);
-    font-weight: 500;
+    font-weight: 600;
+}
+
+.vamariz-installment-note {
+    font-size: 11px;
+    color: var(--vmz-success);
+    font-weight: 600;
+}
+
+/* Action Trigger Button */
+.vamariz-action-block {
+    display: flex;
+    align-items: center;
 }
 
 .vamariz-modal-trigger {
     background: #ffffff;
-    border: 1.5px solid var(--vmz-primary);
-    color: var(--vmz-primary-dark);
-    padding: 8px 16px;
-    min-height: 40px;
-    border-radius: 8px;
+    border: 1.5px solid var(--vmz-text-dark);
+    color: var(--vmz-text-dark);
+    padding: 9px 18px;
+    min-height: 42px;
+    border-radius: 10px;
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 7px;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     font-family: inherit;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.vamariz-modal-trigger svg {
+    transition: transform 0.2s ease;
 }
 
 .vamariz-modal-trigger:hover,
 .vamariz-modal-trigger:focus {
-    background: var(--vmz-primary);
+    background: var(--vmz-text-dark);
     color: #ffffff;
-    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+    border-color: var(--vmz-text-dark);
+    box-shadow: 0 4px 14px rgba(24, 24, 27, 0.2);
     outline: none;
+    transform: translateY(-1px);
 }
 
-.vamariz-widget-sub {
-    font-size: 12px;
+.vamariz-modal-trigger:hover svg {
+    transform: translateX(-2px);
+}
+
+/* Mini 4-Stage Stepper Track */
+.vamariz-mini-stepper {
+    background: var(--vmz-surface-subtle);
+    border: 1px solid var(--vmz-border-subtle);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+}
+
+.vamariz-step-track {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.vamariz-track-node {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 600;
     color: var(--vmz-text-muted);
-    margin-top: 12px;
-    border-top: 1px dashed #e2e8f0;
-    padding-top: 10px;
+}
+
+.vamariz-node-bullet {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1px solid var(--vmz-border-strong);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--vmz-text-body);
+}
+
+.vamariz-track-node.is-active {
+    color: var(--vmz-accent-gold-dark);
+    font-weight: 700;
+}
+
+.vamariz-track-node.is-active .vamariz-node-bullet {
+    background: var(--vmz-accent-gold);
+    color: #ffffff;
+    border-color: var(--vmz-accent-gold);
+    box-shadow: 0 0 0 2px rgba(180, 155, 120, 0.25);
+}
+
+.vamariz-track-line {
+    flex-grow: 1;
+    height: 1.5px;
+    background: var(--vmz-border-subtle);
+    margin: 0 8px;
+}
+
+/* Trust Perks Row */
+.vamariz-widget-perks {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--vmz-border-subtle);
+    font-size: 11.5px;
+    color: var(--vmz-text-body);
 }
 
-.vamariz-sub-pill {
+.vamariz-perk-item {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    font-weight: 500;
+    font-weight: 600;
+}
+
+.vamariz-perk-item svg {
+    color: var(--vmz-accent-gold-dark);
+    flex-shrink: 0;
 }
 
 /* ==========================================================================
@@ -169,9 +303,9 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(15, 23, 42, 0.65);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    background: rgba(24, 24, 27, 0.6);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     z-index: 999999;
     display: flex;
     align-items: center;
@@ -179,25 +313,26 @@
     padding: 16px;
     direction: rtl;
     text-align: right;
+    font-feature-settings: "tnum" 1, "ss01" 1;
 }
 
 .vamariz-modal-dialog {
     background: #ffffff;
     width: 100%;
-    max-width: 620px;
-    border-radius: 16px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    max-width: 630px;
+    border-radius: 18px;
+    box-shadow: var(--vmz-shadow-modal);
     overflow: hidden;
-    animation: vamarizFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: vamarizScaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     max-height: 90vh;
     display: flex;
     flex-direction: column;
 }
 
-@keyframes vamarizFadeIn {
+@keyframes vamarizScaleIn {
     from {
         opacity: 0;
-        transform: translateY(16px) scale(0.97);
+        transform: translateY(14px) scale(0.97);
     }
     to {
         opacity: 1;
@@ -209,55 +344,54 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 22px;
+    padding: 18px 24px;
     background: #ffffff;
     border-bottom: 1px solid var(--vmz-border-subtle);
     flex-shrink: 0;
 }
 
-.vamariz-header-title {
+.vamariz-modal-header-info {
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
 .vamariz-fintech-icon {
-    width: 40px;
-    height: 40px;
-    background: var(--vmz-primary-light);
-    color: var(--vmz-primary-dark);
+    width: 42px;
+    height: 42px;
+    background: var(--vmz-accent-gold-light);
+    color: var(--vmz-accent-gold-dark);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 10px;
-    border: 1px solid var(--vmz-primary-border);
+    border-radius: 12px;
+    border: 1px solid var(--vmz-accent-gold-border);
     flex-shrink: 0;
 }
 
-.vamariz-header-title h3 {
+.vamariz-modal-header-info h3 {
     margin: 0;
     font-size: 16px;
     font-weight: 800;
     color: var(--vmz-text-dark);
-    line-height: 1.3;
+    line-height: 1.35;
 }
 
-.vamariz-header-sub {
+.vamariz-modal-subtitle {
+    margin: 2px 0 0;
     font-size: 12px;
     color: var(--vmz-text-muted);
     font-weight: 500;
-    display: block;
-    margin-top: 2px;
 }
 
-/* Accessible 44x44px touch target close button */
+/* Accessible Close Button (44px min target) */
 .vamariz-modal-close {
     width: 44px;
     height: 44px;
     min-width: 44px;
     min-height: 44px;
     border-radius: 50%;
-    background: #f1f5f9;
+    background: #f4f4f5;
     border: 1px solid transparent;
     color: var(--vmz-text-muted);
     cursor: pointer;
@@ -270,26 +404,25 @@
 
 .vamariz-modal-close:hover,
 .vamariz-modal-close:focus {
-    background: #e2e8f0;
+    background: #e4e4e7;
     color: var(--vmz-text-dark);
-    border-color: #cbd5e1;
     outline: none;
 }
 
 .vamariz-modal-body {
-    padding: 20px 22px;
+    padding: 22px 24px;
     overflow-y: auto;
     flex-grow: 1;
 }
 
 /* ==========================================================================
-   3. Installment Breakdown Card
+   3. Modal Schedule Breakdown Card
    ========================================================================== */
 
 .vamariz-breakdown-card {
-    background: var(--vmz-primary-light);
-    border: 1px solid var(--vmz-primary-border);
-    border-radius: 12px;
+    background: var(--vmz-surface-subtle);
+    border: 1px solid var(--vmz-border-subtle);
+    border-radius: 14px;
     padding: 16px;
     margin-bottom: 22px;
 }
@@ -300,9 +433,9 @@
     align-items: center;
     font-size: 13px;
     font-weight: 700;
-    color: var(--vmz-primary-dark);
+    color: var(--vmz-text-dark);
     margin-bottom: 14px;
-    border-bottom: 1px dashed #a7f3d0;
+    border-bottom: 1px dashed var(--vmz-border-subtle);
     padding-bottom: 10px;
     flex-wrap: wrap;
     gap: 8px;
@@ -314,12 +447,16 @@
     gap: 6px;
 }
 
+.vamariz-card-header-label svg {
+    color: var(--vmz-accent-gold-dark);
+}
+
 .vamariz-total-pill {
     color: var(--vmz-text-body);
     background: #ffffff;
-    padding: 3px 10px;
+    padding: 4px 11px;
     border-radius: 20px;
-    border: 1px solid #d1fae5;
+    border: 1px solid var(--vmz-border-subtle);
     font-size: 12px;
 }
 
@@ -336,38 +473,38 @@
 .vamariz-step-item {
     background: #ffffff;
     border: 1px solid var(--vmz-border-subtle);
-    border-radius: 10px;
-    padding: 12px 10px;
+    border-radius: 12px;
+    padding: 14px 10px;
     text-align: center;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     position: relative;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .vamariz-step-item:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
 }
 
 .vamariz-step-item.active-step {
-    border-color: var(--vmz-primary);
+    border-color: var(--vmz-accent-gold);
     background: #ffffff;
-    box-shadow: 0 0 0 1px var(--vmz-primary), 0 4px 12px rgba(5, 150, 105, 0.12);
+    box-shadow: 0 0 0 1px var(--vmz-accent-gold), 0 4px 14px rgba(180, 155, 120, 0.15);
 }
 
 .vamariz-step-badge {
     position: absolute;
-    top: -9px;
+    top: -10px;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--vmz-primary);
+    background: var(--vmz-accent-gold-dark);
     color: #ffffff;
     font-size: 10px;
     font-weight: 700;
-    padding: 1px 8px;
+    padding: 2px 9px;
     border-radius: 12px;
     white-space: nowrap;
 }
@@ -385,11 +522,12 @@
     display: block;
     font-size: 14px;
     font-weight: 800;
-    color: var(--vmz-primary-dark);
+    color: var(--vmz-text-dark);
 }
 
 .vamariz-step-amount strong {
     font-size: 16px;
+    color: var(--vmz-accent-gold-dark);
 }
 
 .vamariz-step-amount small {
@@ -402,24 +540,25 @@
     display: block;
     font-size: 11px;
     font-weight: 600;
-    color: var(--vmz-text-muted); /* WCAG 4.5+:1 pass */
-    margin-top: 6px;
-    background: #f1f5f9;
-    padding: 3px 4px;
+    color: var(--vmz-text-muted);
+    margin-top: 8px;
+    background: #f4f4f5;
+    padding: 3px 5px;
     border-radius: 6px;
 }
 
 .vamariz-step-date.highlight-date {
-    background: #dcfce7;
-    color: #166534;
+    background: var(--vmz-accent-gold-light);
+    color: var(--vmz-accent-gold-dark);
+    font-weight: 700;
 }
 
 /* ==========================================================================
-   4. Process Steps & Terms
+   4. Timeline Process Steps & Eligibility
    ========================================================================== */
 
 .vamariz-info-section h4 {
-    margin: 15px 0 12px;
+    margin: 18px 0 14px;
     font-size: 14px;
     color: var(--vmz-text-dark);
     font-weight: 800;
@@ -434,176 +573,244 @@
 .vamariz-info-steps li {
     display: flex;
     gap: 14px;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
     align-items: flex-start;
 }
 
 .vamariz-circle-num {
     width: 28px;
     height: 28px;
-    background: var(--vmz-primary-light);
-    color: var(--vmz-primary-dark);
-    border: 1px solid var(--vmz-primary-border);
+    background: var(--vmz-accent-gold-light);
+    color: var(--vmz-accent-gold-dark);
+    border: 1px solid var(--vmz-accent-gold-border);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 800;
     flex-shrink: 0;
     margin-top: 2px;
 }
 
 .vamariz-info-steps strong {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--vmz-text-dark);
     display: block;
+    font-size: 13px;
+    color: var(--vmz-text-dark);
+    margin-bottom: 3px;
 }
 
 .vamariz-info-steps p {
-    margin: 3px 0 0;
-    font-size: 12px;
-    color: var(--vmz-text-muted);
-    line-height: 1.65;
-}
-
-.vamariz-terms-box {
-    background: var(--vmz-bg-subtle);
-    border: 1px solid var(--vmz-border-subtle);
-    border-radius: 10px;
-    padding: 14px 16px;
+    margin: 0;
     font-size: 12px;
     color: var(--vmz-text-body);
-    margin-top: 18px;
-    line-height: 1.65;
+    line-height: 1.7;
 }
 
-.vamariz-terms-box strong {
-    color: var(--vmz-text-dark);
+/* Eligibility Status Cards */
+.vamariz-eligibility-card {
     display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 6px;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    margin-top: 18px;
     font-size: 12.5px;
 }
 
+.vamariz-eligibility-card.is-active-member {
+    background: var(--vmz-success-light);
+    border: 1px solid var(--vmz-success-border);
+    color: #14532d;
+}
+
+.vamariz-eligibility-card.is-active-member strong {
+    color: #166534;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.vamariz-eligibility-card.is-active-member p {
+    margin: 0;
+    color: #15803d;
+    line-height: 1.65;
+}
+
+.vamariz-eligibility-card.is-guest-preview {
+    background: var(--vmz-accent-gold-light);
+    border: 1px solid var(--vmz-accent-gold-border);
+    color: var(--vmz-accent-gold-dark);
+}
+
+.vamariz-eligibility-card.is-guest-preview strong {
+    color: #715535;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.vamariz-eligibility-card.is-guest-preview p {
+    margin: 0;
+    color: #8c7353;
+    line-height: 1.65;
+}
+
+.vamariz-card-icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* Modal Footer */
 .vamariz-modal-footer {
-    padding: 16px 22px;
-    background: var(--vmz-bg-subtle);
+    padding: 16px 24px;
+    background: #ffffff;
     border-top: 1px solid var(--vmz-border-subtle);
-    text-align: left;
+    display: flex;
+    justify-content: flex-end;
     flex-shrink: 0;
 }
 
 .vamariz-btn-primary {
-    background: var(--vmz-primary);
+    background: var(--vmz-text-dark);
     color: #ffffff;
     border: none;
-    padding: 10px 24px;
+    padding: 11px 26px;
     min-height: 44px;
-    border-radius: 8px;
-    font-size: 13px;
+    border-radius: 10px;
+    font-size: 13.5px;
     font-weight: 700;
     cursor: pointer;
     font-family: inherit;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 6px rgba(5, 150, 105, 0.25);
+    box-shadow: 0 2px 6px rgba(24, 24, 27, 0.18);
+    width: 100%;
 }
 
 .vamariz-btn-primary:hover,
 .vamariz-btn-primary:focus {
-    background: var(--vmz-primary-dark);
-    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.35);
+    background: #27272a;
+    box-shadow: 0 4px 14px rgba(24, 24, 27, 0.28);
     outline: none;
+    transform: translateY(-1px);
 }
 
 /* ==========================================================================
-   5. Responsive Breakdown
-   ========================================================================== */
-
-@media (max-width: 580px) {
-    .vamariz-steps-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
-    
-    .vamariz-widget-content {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .vamariz-modal-trigger {
-        justify-content: center;
-        width: 100%;
-    }
-
-    .vamariz-modal-dialog {
-        border-radius: 12px;
-    }
-
-    .vamariz-modal-header {
-        padding: 14px 16px;
-    }
-
-    .vamariz-modal-body {
-        padding: 16px;
-    }
-
-    .vamariz-btn-primary {
-        width: 100%;
-    }
-}
-
-/* ==========================================================================
-   6. Checkout Plan Selector & Installment Breakdown
+   5. Checkout Plan Selector & Installment Breakdown
    ========================================================================== */
 
 .vamariz-checkout-plan-box {
     margin: 20px 0 !important;
     padding: 18px 20px !important;
-    border: 1.5px solid #10b981 !important;
-    border-radius: 12px !important;
-    background: #f0fdf4 !important;
+    border: 1.5px solid var(--vmz-accent-gold) !important;
+    border-radius: 14px !important;
+    background: var(--vmz-accent-gold-light) !important;
     direction: rtl !important;
     text-align: right !important;
-    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.08) !important;
+    box-shadow: 0 2px 12px rgba(180, 155, 120, 0.1) !important;
+    font-feature-settings: "tnum" 1, "ss01" 1;
 }
 
 .vamariz-checkout-plan-box h4 {
     margin: 0 0 14px !important;
-    color: #047857 !important;
+    color: var(--vmz-accent-gold-dark) !important;
     font-size: 15px !important;
-    font-weight: 700 !important;
+    font-weight: 800 !important;
 }
 
 .vamariz-checkout-plan-box label {
     cursor: pointer !important;
     font-size: 14px !important;
-    color: #1e293b !important;
+    color: var(--vmz-text-dark) !important;
 }
 
 .vamariz-checkout-plan-box input[type="radio"] {
-    accent-color: #059669 !important;
+    accent-color: var(--vmz-accent-gold) !important;
     width: 18px !important;
     height: 18px !important;
     cursor: pointer !important;
 }
 
 .vamariz-checkout-breakdown-row td {
-    padding: 14px !important;
-    background: #f0fdf4 !important;
-    border: 1.5px solid #a7f3d0 !important;
-    border-radius: 10px !important;
+    padding: 16px !important;
+    background: var(--vmz-accent-gold-light) !important;
+    border: 1.5px solid var(--vmz-accent-gold-border) !important;
+    border-radius: 12px !important;
+    font-feature-settings: "tnum" 1, "ss01" 1;
 }
 
 .woocommerce-checkout-review-order-table tr.fee {
-    background: #f8fafc;
+    background: #fbfaf8;
 }
 
 .woocommerce-checkout-review-order-table tr.fee th,
 .woocommerce-checkout-review-order-table tr.fee td {
-    color: #047857 !important;
-    font-weight: 600;
+    color: var(--vmz-accent-gold-dark) !important;
+    font-weight: 700;
 }
 
+/* ==========================================================================
+   6. Responsive Layout Breakpoints
+   ========================================================================== */
+
+@media (max-width: 640px) {
+    .vamariz-installment-widget {
+        padding: 14px 16px;
+        margin: 16px 0;
+    }
+
+    .vamariz-widget-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .vamariz-widget-main {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .vamariz-modal-trigger {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .vamariz-mini-stepper {
+        padding: 8px 10px;
+    }
+
+    .vamariz-track-node {
+        font-size: 10.5px;
+        gap: 4px;
+    }
+
+    .vamariz-node-bullet {
+        width: 18px;
+        height: 18px;
+        font-size: 10px;
+    }
+
+    .vamariz-track-line {
+        margin: 0 4px;
+    }
+
+    .vamariz-steps-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .vamariz-modal-dialog {
+        border-radius: 14px;
+    }
+
+    .vamariz-modal-header {
+        padding: 14px 18px;
+    }
+
+    .vamariz-modal-body {
+        padding: 16px 18px;
+    }
+
+    .vamariz-modal-footer {
+        padding: 14px 18px;
+    }
+}

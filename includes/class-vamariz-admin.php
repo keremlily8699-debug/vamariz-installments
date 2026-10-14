@@ -218,6 +218,9 @@ class Vamariz_Admin {
             if (isset($_POST['min_order'])) {
                 update_option('vamariz_min_order_total', (float) $_POST['min_order']);
             }
+            $preview_val = isset($_POST['widget_public_preview']) ? 'yes' : 'no';
+            update_option('vamariz_widget_public_preview', $preview_val);
+
             set_transient('vamariz_admin_notice', array('type' => 'success', 'msg' => 'تنظیمات با موفقیت ذخیره شدند.'), 45);
             wp_safe_redirect(admin_url('admin.php?page=vamariz-installments&tab=settings'));
             exit;
@@ -986,6 +989,7 @@ vamareys.com</textarea>
         $from     = get_option('vamariz_sms_from_number', Vamariz_SMS::DEFAULT_FROM);
         $api_url  = get_option('vamariz_sms_api_url', Vamariz_SMS::SIMPLE_API_URL);
         $min_ord  = get_option('vamariz_min_order_total', 500000);
+        $public_preview = get_option('vamariz_widget_public_preview', 'yes');
         ?>
         <div class="vamariz-card-box" style="background:#fff; padding:25px; border:1px solid #ccd0d4; border-radius:6px; max-width:750px;">
             <h3 style="margin-top:0;">تنظیمات احراز هویت وب‌سرویس ملی‌پیامک و فروشگاه</h3>
@@ -1020,6 +1024,16 @@ vamareys.com</textarea>
                         <td>
                             <input type="number" name="min_order" id="min_order" class="regular-text" value="<?php echo esc_attr($min_ord); ?>" required min="0" step="50000">
                             <p class="description">سفارش‌های با مبلغ کمتر از این مقدار، امکان انتخاب خرید اقساطی ۴ ماهه را نخواهند داشت.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="widget_public_preview">نمایش عمومی بنر اقساط در صفحه محصول</label></th>
+                        <td>
+                            <label style="font-weight:600; cursor:pointer;">
+                                <input type="checkbox" name="widget_public_preview" id="widget_public_preview" value="yes" <?php checked($public_preview, 'yes'); ?>>
+                                فعال‌سازی نمایش نوار و بنر لوکس اقساط ۴ ماهه برای تمام کاربران و مهمانان در صفحه محصول
+                            </label>
+                            <p class="description">در صورت فعال بودن، تمام بازدیدکنندگان بنر و استپر اقساطی ۴ ماهه و پنجره شبیه‌ساز را مشاهده می‌کنند؛ در صورت غیرفعال بودن، این نوار فقط برای کاربران دارای نقش «مشتری اقساطی» و مدیران فروشگاه نمایش داده می‌شود.</p>
                         </td>
                     </tr>
                 </table>
