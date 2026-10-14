@@ -3,7 +3,7 @@
  * Plugin Name: خرید اقساطی ۴ ماهه واماریز (Vamareys Installments for WooCommerce)
  * Plugin URI: https://vamareys.com
  * Description: سیستم جامع، مستقل و اختصاصی خرید اقساطی در ۴ مرحله (۴ قسط ۲۵ درصدی) برای فروشگاه واماریز (Vamareys) به همراه سامانه پیامکی خدماتی ملی‌پیامک، مدیریت دعوت‌نامه‌ها، تفکیک نقش مشتری اقساطی و هماهنگی کامل با ووکامرس.
- * Version: 1.3.4
+ * Version: 1.3.5
  * Author: واماریز (Vamareys)
  * Author URI: https://vamareys.com
  * Text Domain: vamariz-installments
@@ -21,8 +21,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('VAMAREYS_INSTALLMENTS_VERSION', '1.3.4');
-define('VAMARIZ_INSTALLMENTS_VERSION', '1.3.4');
+define('VAMAREYS_INSTALLMENTS_VERSION', '1.3.5');
+define('VAMARIZ_INSTALLMENTS_VERSION', '1.3.5');
 define('VAMAREYS_INSTALLMENTS_FILE', __FILE__);
 define('VAMARIZ_INSTALLMENTS_FILE', __FILE__);
 define('VAMAREYS_INSTALLMENTS_PATH', plugin_dir_path(__FILE__));
