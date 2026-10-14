@@ -72,7 +72,14 @@ function vamariz_wpcode_is_customer() {
     return in_array('installment_customer', (array) $user->roles, true);
 }
 
-// مخفی کردن درگاه اسنپ‌پی در تسویه‌حساب
+// حذف فیلتر اسنپ‌پی برای جلوگیری از کندی و خطاهای نال‌پوینتر در PHP 8.1
+add_action('wp', function () {
+    if (!is_admin() && vamariz_wpcode_is_customer()) {
+        remove_filter('woocommerce_available_payment_gateways', 'show_snapppay_payment_gateway_based_on_cart_amount', PHP_INT_MAX);
+    }
+}, 5);
+
+// مخفی کردن درگاه اسنپ‌پی در تسویه‌حساب برای مشتریان اقساطی
 add_filter('woocommerce_available_payment_gateways', function ($gateways) {
     if (!is_admin() && vamariz_wpcode_is_customer()) {
         foreach ($gateways as $id => $gateway) {
@@ -82,7 +89,7 @@ add_filter('woocommerce_available_payment_gateways', function ($gateways) {
         }
     }
     return $gateways;
-}, 99);
+}, PHP_INT_MAX);
 
 // مخفی کردن ویجت اسنپ‌پی در صفحه محصول
 add_action('wp_head', function () {

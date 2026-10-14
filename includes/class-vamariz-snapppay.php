@@ -21,11 +21,24 @@ class Vamariz_SnappPay {
     }
 
     public function __construct() {
+        // Remove SnappPay's hook before it runs to avoid slow external API calls and null-pointer errors
+        add_action('wp', array($this, 'maybe_remove_snapppay_filter'), 5);
+        add_action('woocommerce_init', array($this, 'maybe_remove_snapppay_filter'), 5);
+
         // Suppress SnappPay gateway at checkout for installment customers
-        add_filter('woocommerce_available_payment_gateways', array($this, 'suppress_snapppay_gateway'), 50);
+        add_filter('woocommerce_available_payment_gateways', array($this, 'suppress_snapppay_gateway'), PHP_INT_MAX);
 
         // Suppress SnappPay PDP widget on single product page for installment customers
         add_action('wp_head', array($this, 'suppress_snapppay_pdp_css'), 999);
+    }
+
+    /**
+     * Remove SnappPay filter callback for installment customers.
+     */
+    public function maybe_remove_snapppay_filter() {
+        if (!is_admin() && Vamariz_Roles::is_installment_customer()) {
+            remove_filter('woocommerce_available_payment_gateways', 'show_snapppay_payment_gateway_based_on_cart_amount', PHP_INT_MAX);
+        }
     }
 
     /**
