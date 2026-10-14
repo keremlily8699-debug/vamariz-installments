@@ -165,22 +165,34 @@ class Vamariz_PDP_Widget {
                 <div class="vamariz-step-track">
                     <div class="vamariz-track-node is-active">
                         <span class="vamariz-node-bullet">۱</span>
-                        <span class="vamariz-node-label"><?php esc_html_e('امروز (۲۵٪)', 'vamariz-installments'); ?></span>
+                        <div class="vamariz-node-label">
+                            <span class="vamariz-node-title"><?php esc_html_e('امروز', 'vamariz-installments'); ?></span>
+                            <span class="vamariz-node-pill is-active"><?php esc_html_e('۲۵٪', 'vamariz-installments'); ?></span>
+                        </div>
                     </div>
-                    <div class="vamariz-track-line"></div>
+                    <div class="vamariz-track-line is-active"></div>
                     <div class="vamariz-track-node">
                         <span class="vamariz-node-bullet">۲</span>
-                        <span class="vamariz-node-label"><?php esc_html_e('۳۰ روز بعد', 'vamariz-installments'); ?></span>
+                        <div class="vamariz-node-label">
+                            <span class="vamariz-node-title"><?php esc_html_e('۳۰ روز بعد', 'vamariz-installments'); ?></span>
+                            <span class="vamariz-node-pill"><?php esc_html_e('۲۵٪', 'vamariz-installments'); ?></span>
+                        </div>
                     </div>
                     <div class="vamariz-track-line"></div>
                     <div class="vamariz-track-node">
                         <span class="vamariz-node-bullet">۳</span>
-                        <span class="vamariz-node-label"><?php esc_html_e('۶۰ روز بعد', 'vamariz-installments'); ?></span>
+                        <div class="vamariz-node-label">
+                            <span class="vamariz-node-title"><?php esc_html_e('۶۰ روز بعد', 'vamariz-installments'); ?></span>
+                            <span class="vamariz-node-pill"><?php esc_html_e('۲۵٪', 'vamariz-installments'); ?></span>
+                        </div>
                     </div>
                     <div class="vamariz-track-line"></div>
                     <div class="vamariz-track-node">
                         <span class="vamariz-node-bullet">۴</span>
-                        <span class="vamariz-node-label"><?php esc_html_e('۹۰ روز بعد', 'vamariz-installments'); ?></span>
+                        <div class="vamariz-node-label">
+                            <span class="vamariz-node-title"><?php esc_html_e('۹۰ روز بعد', 'vamariz-installments'); ?></span>
+                            <span class="vamariz-node-pill"><?php esc_html_e('۲۵٪', 'vamariz-installments'); ?></span>
+                        </div>
                     </div>
                 </div>
             </div>
